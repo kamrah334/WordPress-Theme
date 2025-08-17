@@ -1,6 +1,7 @@
+
 <?php
 /**
- * The template for displaying archive pages
+ * The template for displaying search results pages
  *
  * @package Shopora_Premium_Commerce
  */
@@ -14,16 +15,20 @@ get_header();
             <?php if (have_posts()) : ?>
 
                 <header class="page-header">
-                    <?php
-                    the_archive_title('<h1 class="page-title">', '</h1>');
-                    the_archive_description('<div class="archive-description">', '</div>');
-                    ?>
+                    <h1 class="page-title">
+                        <?php
+                        printf(
+                            esc_html__('Search Results for: %s', 'shopora-premium-commerce'),
+                            '<span>' . get_search_query() . '</span>'
+                        );
+                        ?>
+                    </h1>
                 </header>
 
                 <div class="posts-grid">
                     <?php while (have_posts()) : ?>
                         <?php the_post(); ?>
-                        <?php get_template_part('template-parts/content', get_post_type()); ?>
+                        <?php get_template_part('template-parts/content', 'search'); ?>
                     <?php endwhile; ?>
                 </div>
 
@@ -48,4 +53,3 @@ get_header();
 <?php
 get_footer();
 ?>
-

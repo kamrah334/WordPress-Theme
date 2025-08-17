@@ -384,6 +384,109 @@ function shopora_customize_register($wp_customize) {
             'max' => 50,
         ),
     ));
+    
+    // Sidebar Visibility section
+    $wp_customize->add_section('shopora_sidebar', array(
+        'title'    => __('Sidebar Visibility', 'shopora-premium-commerce'),
+        'priority' => 45,
+        'description' => __('Control which pages display the sidebar.', 'shopora-premium-commerce'),
+    ));
+    
+    // Show sidebar on home page
+    $wp_customize->add_setting('sidebar_show_home', array(
+        'default'           => true,
+        'sanitize_callback' => 'wp_validate_boolean',
+    ));
+    
+    $wp_customize->add_control('sidebar_show_home', array(
+        'label'    => __('Show Sidebar on Home Page', 'shopora-premium-commerce'),
+        'section'  => 'shopora_sidebar',
+        'type'     => 'checkbox',
+    ));
+    
+    // Show sidebar on shop page
+    $wp_customize->add_setting('sidebar_show_shop', array(
+        'default'           => true,
+        'sanitize_callback' => 'wp_validate_boolean',
+    ));
+    
+    $wp_customize->add_control('sidebar_show_shop', array(
+        'label'    => __('Show Sidebar on Shop Page', 'shopora-premium-commerce'),
+        'section'  => 'shopora_sidebar',
+        'type'     => 'checkbox',
+    ));
+    
+    // Show sidebar on product pages
+    $wp_customize->add_setting('sidebar_show_product', array(
+        'default'           => false,
+        'sanitize_callback' => 'wp_validate_boolean',
+    ));
+    
+    $wp_customize->add_control('sidebar_show_product', array(
+        'label'    => __('Show Sidebar on Single Product Pages', 'shopora-premium-commerce'),
+        'section'  => 'shopora_sidebar',
+        'type'     => 'checkbox',
+    ));
+    
+    // Show sidebar on blog pages
+    $wp_customize->add_setting('sidebar_show_blog', array(
+        'default'           => true,
+        'sanitize_callback' => 'wp_validate_boolean',
+    ));
+    
+    $wp_customize->add_control('sidebar_show_blog', array(
+        'label'    => __('Show Sidebar on Blog Pages', 'shopora-premium-commerce'),
+        'section'  => 'shopora_sidebar',
+        'type'     => 'checkbox',
+    ));
+    
+    // Show sidebar on single posts
+    $wp_customize->add_setting('sidebar_show_single_post', array(
+        'default'           => true,
+        'sanitize_callback' => 'wp_validate_boolean',
+    ));
+    
+    $wp_customize->add_control('sidebar_show_single_post', array(
+        'label'    => __('Show Sidebar on Single Posts', 'shopora-premium-commerce'),
+        'section'  => 'shopora_sidebar',
+        'type'     => 'checkbox',
+    ));
+    
+    // Show sidebar on pages
+    $wp_customize->add_setting('sidebar_show_pages', array(
+        'default'           => false,
+        'sanitize_callback' => 'wp_validate_boolean',
+    ));
+    
+    $wp_customize->add_control('sidebar_show_pages', array(
+        'label'    => __('Show Sidebar on Static Pages', 'shopora-premium-commerce'),
+        'section'  => 'shopora_sidebar',
+        'type'     => 'checkbox',
+    ));
+    
+    // Show sidebar on archive pages
+    $wp_customize->add_setting('sidebar_show_archive', array(
+        'default'           => true,
+        'sanitize_callback' => 'wp_validate_boolean',
+    ));
+    
+    $wp_customize->add_control('sidebar_show_archive', array(
+        'label'    => __('Show Sidebar on Archive Pages', 'shopora-premium-commerce'),
+        'section'  => 'shopora_sidebar',
+        'type'     => 'checkbox',
+    ));
+    
+    // Show sidebar on search results
+    $wp_customize->add_setting('sidebar_show_search', array(
+        'default'           => true,
+        'sanitize_callback' => 'wp_validate_boolean',
+    ));
+    
+    $wp_customize->add_control('sidebar_show_search', array(
+        'label'    => __('Show Sidebar on Search Results', 'shopora-premium-commerce'),
+        'section'  => 'shopora_sidebar',
+        'type'     => 'checkbox',
+    ));
 }
 add_action('customize_register', 'shopora_customize_register');
 
@@ -450,6 +553,38 @@ function shopora_render_button($text_setting, $url_setting, $default_text, $defa
         $additional_attrs,
         esc_html($text)
     );
+}
+
+/**
+ * Helper function to check if sidebar should be displayed
+ */
+function shopora_show_sidebar() {
+    // Check if sidebar widget area has any widgets
+    if (!is_active_sidebar('sidebar-1')) {
+        return false;
+    }
+    
+    // Check customizer settings for different page types
+    if (is_front_page()) {
+        return get_theme_mod('sidebar_show_home', true);
+    } elseif (is_shop() || is_product_category() || is_product_tag()) {
+        return get_theme_mod('sidebar_show_shop', true);
+    } elseif (is_product()) {
+        return get_theme_mod('sidebar_show_product', false);
+    } elseif (is_home() || is_category() || is_tag()) {
+        return get_theme_mod('sidebar_show_blog', true);
+    } elseif (is_single() && get_post_type() === 'post') {
+        return get_theme_mod('sidebar_show_single_post', true);
+    } elseif (is_page()) {
+        return get_theme_mod('sidebar_show_pages', false);
+    } elseif (is_archive()) {
+        return get_theme_mod('sidebar_show_archive', true);
+    } elseif (is_search()) {
+        return get_theme_mod('sidebar_show_search', true);
+    }
+    
+    // Default to showing sidebar
+    return true;
 }
 
 /**

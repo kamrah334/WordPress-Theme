@@ -12,7 +12,7 @@ get_header('shop');
 ?>
 <div class="shop-container">
     <div class="container">
-        
+
         <header class="woocommerce-products-header">
             <?php if (apply_filters('woocommerce_show_page_title', true)) : ?>
                 <h1 class="woocommerce-products-header__title page-title"><?php woocommerce_page_title(); ?></h1>
@@ -35,7 +35,7 @@ get_header('shop');
                 <div class="sidebar-header">
                     <h3><i class="fas fa-filter"></i> Filter Products</h3>
                 </div>
-                
+
                 <!-- Search Bar Section -->
                 <div class="filter-section search-section">
                     <h4><i class="fas fa-search"></i> Search Products</h4>
@@ -49,7 +49,7 @@ get_header('shop');
                         </div>
                     </form>
                 </div>
-                
+
                 <!-- Categories Section -->
                 <div class="filter-section">
                     <h4><i class="fas fa-tags"></i> Categories</h4>
@@ -60,7 +60,7 @@ get_header('shop');
                         <li><a href="#" data-category="sports-fitness"><i class="fas fa-dumbbell"></i> Sports & Fitness</a></li>
                     </ul>
                 </div>
-                
+
                 <!-- Price Range Section -->
                 <div class="filter-section">
                     <h4><i class="fas fa-dollar-sign"></i> Price Range</h4>
@@ -71,7 +71,7 @@ get_header('shop');
                         <li><a href="#" data-price="200+"><span class="price-label">Over $200</span></a></li>
                     </ul>
                 </div>
-                
+
                 <!-- Recent Posts Section -->
                 <div class="filter-section">
                     <h4><i class="fas fa-newspaper"></i> Recent Posts</h4>
@@ -81,7 +81,7 @@ get_header('shop');
                             'numberposts' => 5,
                             'post_status' => 'publish'
                         ));
-                        
+
                         if (!empty($recent_posts)) {
                             foreach ($recent_posts as $post) {
                                 echo '<li><a href="' . get_permalink($post['ID']) . '">' . esc_html($post['post_title']) . '</a></li>';
@@ -93,7 +93,7 @@ get_header('shop');
                         ?>
                     </ul>
                 </div>
-                
+
                 <!-- Recent Comments Section -->
                 <div class="filter-section">
                     <h4><i class="fas fa-comments"></i> Recent Comments</h4>
@@ -103,7 +103,7 @@ get_header('shop');
                             'number' => 5,
                             'status' => 'approve'
                         ));
-                        
+
                         if (!empty($recent_comments)) {
                             foreach ($recent_comments as $comment) {
                                 echo '<li><a href="' . get_comment_link($comment) . '">' . esc_html($comment->comment_author) . ' on ' . get_the_title($comment->comment_post_ID) . '</a></li>';
@@ -114,7 +114,7 @@ get_header('shop');
                         ?>
                     </ul>
                 </div>
-                
+
                 <!-- Archives Section -->
                 <div class="filter-section">
                     <h4><i class="fas fa-archive"></i> Archives</h4>
@@ -122,7 +122,7 @@ get_header('shop');
                         <?php wp_get_archives(array('type' => 'monthly', 'limit' => 6)); ?>
                     </ul>
                 </div>
-                
+
                 <?php
                 /**
                  * Hook: woocommerce_sidebar.
@@ -183,6 +183,10 @@ get_header('shop');
                 ?>
             </div>
         </div>
+
+        <?php if (shopora_show_sidebar()) : ?>
+            <?php get_sidebar(); ?>
+        <?php endif; ?>
     </div>
 </div>
 

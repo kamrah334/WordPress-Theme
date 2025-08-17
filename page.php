@@ -25,7 +25,9 @@ get_header();
             <?php endwhile; ?>
         </div>
 
-        <?php get_sidebar(); ?>
+        <?php if (shopora_show_sidebar()) : ?>
+            <?php get_sidebar(); ?>
+        <?php endif; ?>
     </div>
 </main>
 
