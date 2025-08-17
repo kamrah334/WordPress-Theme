@@ -122,31 +122,94 @@ get_header();
                     else :
                         // Fallback products
                         ?>
-                        <div class="product-card">
-                            <div class="product-placeholder">
-                                <i class="fas fa-headphones" style="font-size: 3rem; color: var(--primary-color);"></i>
+                        <div class="product-card fade-in">
+                            <div class="product-image-container">
+                                <div class="product-placeholder">
+                                    <i class="fas fa-headphones" style="font-size: 3rem; color: var(--primary-color);"></i>
+                                </div>
                             </div>
-                            <h3 class="product-title">Premium Wireless Headphones</h3>
-                            <div class="product-price">$299.00</div>
-                            <a href="<?php echo esc_url(wc_get_page_permalink('shop')); ?>" class="btn btn-primary">Shop Now</a>
+                            <div class="product-info">
+                                <h3 class="product-title">Premium Wireless Headphones</h3>
+                                <div class="product-price">$299.00</div>
+                                <div class="product-actions">
+                                    <a href="<?php echo esc_url(wc_get_page_permalink('shop')); ?>" class="btn btn-primary">Shop Now</a>
+                                </div>
+                            </div>
                         </div>
                         
-                        <div class="product-card">
-                            <div class="product-placeholder">
-                                <i class="fas fa-laptop" style="font-size: 3rem; color: var(--primary-color);"></i>
+                        <div class="product-card fade-in">
+                            <div class="product-image-container">
+                                <div class="product-placeholder">
+                                    <i class="fas fa-laptop" style="font-size: 3rem; color: var(--primary-color);"></i>
+                                </div>
                             </div>
-                            <h3 class="product-title">Smart Laptop</h3>
-                            <div class="product-price">$1,299.00</div>
-                            <a href="<?php echo esc_url(wc_get_page_permalink('shop')); ?>" class="btn btn-primary">Shop Now</a>
+                            <div class="product-info">
+                                <h3 class="product-title">Smart Laptop</h3>
+                                <div class="product-price">$1,299.00</div>
+                                <div class="product-actions">
+                                    <a href="<?php echo esc_url(wc_get_page_permalink('shop')); ?>" class="btn btn-primary">Shop Now</a>
+                                </div>
+                            </div>
                         </div>
                         
-                        <div class="product-card">
-                            <div class="product-placeholder">
-                                <i class="fas fa-mobile-alt" style="font-size: 3rem; color: var(--primary-color);"></i>
+                        <div class="product-card fade-in">
+                            <div class="product-image-container">
+                                <div class="product-placeholder">
+                                    <i class="fas fa-mobile-alt" style="font-size: 3rem; color: var(--primary-color);"></i>
+                                </div>
                             </div>
-                            <h3 class="product-title">Smartphone Pro</h3>
-                            <div class="product-price">$899.00</div>
-                            <a href="<?php echo esc_url(wc_get_page_permalink('shop')); ?>" class="btn btn-primary">Shop Now</a>
+                            <div class="product-info">
+                                <h3 class="product-title">Smartphone Pro</h3>
+                                <div class="product-price">$899.00</div>
+                                <div class="product-actions">
+                                    <a href="<?php echo esc_url(wc_get_page_permalink('shop')); ?>" class="btn btn-primary">Shop Now</a>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="product-card fade-in">
+                            <div class="product-image-container">
+                                <div class="product-placeholder">
+                                    <i class="fas fa-watch" style="font-size: 3rem; color: var(--primary-color);"></i>
+                                </div>
+                            </div>
+                            <div class="product-info">
+                                <h3 class="product-title">Smart Watch</h3>
+                                <div class="product-price">$399.00</div>
+                                <div class="product-actions">
+                                    <a href="<?php echo esc_url(wc_get_page_permalink('shop')); ?>" class="btn btn-primary">Shop Now</a>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="product-card fade-in">
+                            <div class="product-image-container">
+                                <div class="product-placeholder">
+                                    <i class="fas fa-camera" style="font-size: 3rem; color: var(--primary-color);"></i>
+                                </div>
+                            </div>
+                            <div class="product-info">
+                                <h3 class="product-title">Digital Camera</h3>
+                                <div class="product-price">$799.00</div>
+                                <div class="product-actions">
+                                    <a href="<?php echo esc_url(wc_get_page_permalink('shop')); ?>" class="btn btn-primary">Shop Now</a>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="product-card fade-in">
+                            <div class="product-image-container">
+                                <div class="product-placeholder">
+                                    <i class="fas fa-gamepad" style="font-size: 3rem; color: var(--primary-color);"></i>
+                                </div>
+                            </div>
+                            <div class="product-info">
+                                <h3 class="product-title">Gaming Controller</h3>
+                                <div class="product-price">$89.00</div>
+                                <div class="product-actions">
+                                    <a href="<?php echo esc_url(wc_get_page_permalink('shop')); ?>" class="btn btn-primary">Shop Now</a>
+                                </div>
+                            </div>
                         </div>
                     <?php endif; ?>
                 </div>

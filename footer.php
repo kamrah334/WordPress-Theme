@@ -15,14 +15,9 @@
                     <?php if (is_active_sidebar('footer-1')) : ?>
                         <?php dynamic_sidebar('footer-1'); ?>
                     <?php else : ?>
-                        <h3>Premium Commerce</h3>
-                        <p>Your trusted partner for premium products and exceptional customer service.</p>
-                        <div class="social-links">
-                            <a href="#" aria-label="Facebook"><i class="fab fa-facebook"></i></a>
-                            <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
-                            <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
-                            <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
-                        </div>
+                        <h3><?php echo esc_html(get_theme_mod('header_logo_text', get_bloginfo('name'))); ?></h3>
+                        <p><?php echo esc_html(get_theme_mod('footer_text', 'Your trusted partner for premium products and exceptional customer service.')); ?></p>
+                        <?php shopora_display_social_links(); ?>
                     <?php endif; ?>
                 </div>
 
