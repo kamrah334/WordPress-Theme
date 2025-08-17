@@ -716,9 +716,9 @@
     grid-template-columns: repeat(5, 1fr) !important;
 }
 
-/* Desktop - With Sidebar: 4 Products Per Row (to accommodate sidebar) */
+/* Desktop - With Sidebar: 5 Products Per Row (beside sidebar) */
 .shop-layout.has-sidebar .woocommerce ul.products {
-    grid-template-columns: repeat(4, 1fr) !important;
+    grid-template-columns: repeat(5, 1fr) !important;
 }
 
 /* Large Desktop - Adjustments */
@@ -737,18 +737,18 @@
         grid-template-columns: repeat(4, 1fr) !important;
     }
     .shop-layout.has-sidebar .woocommerce ul.products {
-        grid-template-columns: repeat(3, 1fr) !important;
+        grid-template-columns: repeat(4, 1fr) !important;
     }
 }
 
-/* Tablet - 3 Products Per Row */
+/* Tablet - 4 Products Per Row */
 @media (max-width: 1200px) {
     .shop-layout.no-sidebar .woocommerce ul.products {
-        grid-template-columns: repeat(3, 1fr) !important;
+        grid-template-columns: repeat(4, 1fr) !important;
         gap: 18px !important;
     }
     .shop-layout.has-sidebar .woocommerce ul.products {
-        grid-template-columns: repeat(3, 1fr) !important;
+        grid-template-columns: repeat(4, 1fr) !important;
         gap: 18px !important;
     }
 }
@@ -1107,10 +1107,15 @@
 
 .shop-layout.has-sidebar {
     flex-direction: row;
+    align-items: flex-start;
 }
 
 .shop-layout.no-sidebar {
     flex-direction: column;
+}
+
+.shop-layout.no-sidebar .shop-main {
+    width: 100%;
 }
 
 .shop-sidebar {
@@ -1125,9 +1130,13 @@
 .shop-main {
     flex: 1;
     min-width: 0;
-    width: 100%;
+    width: calc(100% - 310px); /* Account for sidebar width + gap */
     overflow: hidden;
     order: 2;
+}
+
+.shop-layout.has-sidebar .shop-main {
+    width: calc(100% - 310px); /* Account for sidebar width + gap */
 }
 
 /* Ensure products container doesn't overflow */
@@ -1200,6 +1209,17 @@
     
     .shop-main {
         order: 1;
+        width: 100% !important;
+    }
+    
+    .shop-layout.has-sidebar .woocommerce ul.products {
+        grid-template-columns: repeat(3, 1fr) !important;
+        gap: 15px !important;
+    }
+    
+    .shop-layout.no-sidebar .woocommerce ul.products {
+        grid-template-columns: repeat(3, 1fr) !important;
+        gap: 15px !important;
     }
     
     .woocommerce-products-header h1 {
