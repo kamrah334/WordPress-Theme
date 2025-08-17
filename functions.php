@@ -461,12 +461,12 @@ function shopora_woocommerce_init() {
     
     // Change number of products per row
     add_filter('loop_shop_columns', function() {
-        return 3;
+        return 5; // Set to 5 products per row
     });
     
     // Change number of products per page
     add_filter('loop_shop_per_page', function() {
-        return 9;
+        return 15; // Increased to accommodate 5x3 grid
     });
 }
 add_action('init', 'shopora_woocommerce_init');
