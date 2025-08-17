@@ -1,4 +1,3 @@
-
 <?php
 /**
  * Shopora Premium Commerce Theme Functions
@@ -25,28 +24,46 @@ function shopora_setup() {
         'comment-list',
         'gallery',
         'caption',
+        'script',
+        'style',
+        'navigation-widgets',
     ));
-    
+
+    // Add theme support for responsive embeds
+    add_theme_support('responsive-embeds');
+
+    // Add theme support for editor styles
+    add_theme_support('editor-styles');
+    add_editor_style('assets/css/main.css');
+
+    // Add theme support for custom background
+    add_theme_support('custom-background');
+
+    // Add theme support for selective refresh for widgets
+    add_theme_support('customize-selective-refresh-widgets');
+
     // Add WooCommerce support
     add_theme_support('woocommerce');
     add_theme_support('wc-product-gallery-zoom');
     add_theme_support('wc-product-gallery-lightbox');
     add_theme_support('wc-product-gallery-slider');
-    
+
     // Register navigation menus
     register_nav_menus(array(
         'primary' => __('Primary Menu', 'shopora-premium-commerce'),
         'footer' => __('Footer Menu', 'shopora-premium-commerce'),
+        'mobile' => __('Mobile Menu', 'shopora-premium-commerce'),
     ));
-    
-    // Add support for editor styles
-    add_theme_support('editor-styles');
-    add_editor_style('assets/css/main.css');
-    
+
     // Set content width
     if (!isset($content_width)) {
         $content_width = 1200;
     }
+
+    // Add image sizes
+    add_image_size('shopora-featured', 800, 600, true);
+    add_image_size('shopora-blog-grid', 400, 300, true);
+    add_image_size('shopora-product-grid', 300, 300, true);
 }
 add_action('after_setup_theme', 'shopora_setup');
 
@@ -55,24 +72,30 @@ add_action('after_setup_theme', 'shopora_setup');
  */
 function shopora_scripts() {
     // Enqueue main stylesheet
-    wp_enqueue_style('shopora-style', get_stylesheet_uri(), array(), '1.2.0');
-    wp_enqueue_style('shopora-main', get_template_directory_uri() . '/assets/css/main.css', array(), '1.2.0');
-    
+    wp_enqueue_style('shopora-style', get_stylesheet_uri(), array(), wp_get_theme()->get('Version'));
+
+    // Enqueue main CSS file
+    wp_enqueue_style('shopora-main', get_template_directory_uri() . '/assets/css/main.css', array(), wp_get_theme()->get('Version'));
+
     // Enqueue Google Fonts
-    wp_enqueue_style('shopora-fonts', 'https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap', array(), null);
-    
+    $google_fonts_url = shopora_get_google_fonts_url();
+    if ($google_fonts_url) {
+        wp_enqueue_style('shopora-fonts', $google_fonts_url, array(), null);
+    }
+
     // Enqueue Font Awesome
-    wp_enqueue_style('font-awesome', 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css', array(), '6.4.0');
-    
+    wp_enqueue_style('font-awesome', 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css', array(), '6.5.0');
+
     // Enqueue main JavaScript
-    wp_enqueue_script('shopora-main', get_template_directory_uri() . '/assets/js/main.js', array('jquery'), '1.2.0', true);
-    
+    wp_enqueue_script('shopora-main', get_template_directory_uri() . '/assets/js/main.js', array('jquery'), wp_get_theme()->get('Version'), true);
+
     // Localize script for AJAX
     wp_localize_script('shopora-main', 'shopora_ajax', array(
         'ajax_url' => admin_url('admin-ajax.php'),
-        'nonce' => wp_create_nonce('shopora_nonce')
+        'nonce' => wp_create_nonce('shopora_nonce'),
+        'home_url' => home_url('/'),
     ));
-    
+
     // Enqueue comment reply script
     if (is_singular() && comments_open() && get_option('thread_comments')) {
         wp_enqueue_script('comment-reply');
@@ -81,19 +104,37 @@ function shopora_scripts() {
 add_action('wp_enqueue_scripts', 'shopora_scripts');
 
 /**
+ * Get Google Fonts URL
+ */
+function shopora_get_google_fonts_url() {
+    $heading_font = get_theme_mod('heading_font_family', 'Inter');
+    $body_font = get_theme_mod('body_font_family', 'Inter');
+
+    $fonts = array();
+
+    if ($heading_font && $heading_font !== 'inherit') {
+        $fonts[] = $heading_font . ':300,400,500,600,700,800';
+    }
+
+    if ($body_font && $body_font !== 'inherit' && $body_font !== $heading_font) {
+        $fonts[] = $body_font . ':300,400,500,600,700';
+    }
+
+    if (empty($fonts)) {
+        $fonts[] = 'Inter:300,400,500,600,700,800';
+    }
+
+    return add_query_arg(array(
+        'family' => implode('|', $fonts),
+        'display' => 'swap',
+    ), 'https://fonts.googleapis.com/css2');
+}
+
+/**
  * Register widget areas
  */
 function shopora_widgets_init() {
-    register_sidebar(array(
-        'name'          => __('Shop Sidebar', 'shopora-premium-commerce'),
-        'id'            => 'shop-sidebar',
-        'description'   => __('Sidebar for shop and product pages', 'shopora-premium-commerce'),
-        'before_widget' => '<section id="%1$s" class="widget filter-section %2$s">',
-        'after_widget'  => '</section>',
-        'before_title'  => '<h4 class="widget-title">',
-        'after_title'   => '</h4>',
-    ));
-    
+    // Main Sidebar
     register_sidebar(array(
         'name'          => __('Main Sidebar', 'shopora-premium-commerce'),
         'id'            => 'sidebar-1',
@@ -103,7 +144,18 @@ function shopora_widgets_init() {
         'before_title'  => '<h2 class="widget-title">',
         'after_title'   => '</h2>',
     ));
-    
+
+    // Shop Sidebar
+    register_sidebar(array(
+        'name'          => __('Shop Sidebar', 'shopora-premium-commerce'),
+        'id'            => 'shop-sidebar',
+        'description'   => __('Sidebar for shop and product pages', 'shopora-premium-commerce'),
+        'before_widget' => '<section id="%1$s" class="widget filter-section %2$s">',
+        'after_widget'  => '</section>',
+        'before_title'  => '<h4 class="widget-title">',
+        'after_title'   => '</h4>',
+    ));
+
     // Footer widgets
     for ($i = 1; $i <= 4; $i++) {
         register_sidebar(array(
@@ -116,6 +168,17 @@ function shopora_widgets_init() {
             'after_title'   => '</h3>',
         ));
     }
+
+    // Header Widget Area
+    register_sidebar(array(
+        'name'          => __('Header Widget Area', 'shopora-premium-commerce'),
+        'id'            => 'header-widget',
+        'description'   => __('Widget area in the header', 'shopora-premium-commerce'),
+        'before_widget' => '<div id="%1$s" class="header-widget %2$s">',
+        'after_widget'  => '</div>',
+        'before_title'  => '<h4 class="widget-title">',
+        'after_title'   => '</h4>',
+    ));
 }
 add_action('widgets_init', 'shopora_widgets_init');
 
@@ -142,18 +205,23 @@ function shopora_body_classes($classes) {
     if (!is_singular()) {
         $classes[] = 'hfeed';
     }
-    
+
     if (is_front_page()) {
         $classes[] = 'front-page';
     }
-    
+
     // Add sidebar class
     if (shopora_show_sidebar()) {
         $classes[] = 'has-sidebar';
     } else {
         $classes[] = 'no-sidebar';
     }
-    
+
+    // Add mobile class
+    if (wp_is_mobile()) {
+        $classes[] = 'is-mobile';
+    }
+
     return $classes;
 }
 add_filter('body_class', 'shopora_body_classes');
@@ -162,376 +230,283 @@ add_filter('body_class', 'shopora_body_classes');
  * Customizer settings
  */
 function shopora_customize_register($wp_customize) {
-    
+
+    // Header Panel
+    $wp_customize->add_panel('shopora_header', array(
+        'title'    => __('Header Settings', 'shopora-premium-commerce'),
+        'priority' => 25,
+    ));
+
+    // Header Layout Section
+    $wp_customize->add_section('shopora_header_layout', array(
+        'title'    => __('Header Layout', 'shopora-premium-commerce'),
+        'panel'    => 'shopora_header',
+        'priority' => 10,
+    ));
+
+    $wp_customize->add_setting('header_layout', array(
+        'default'           => 'default',
+        'sanitize_callback' => 'sanitize_text_field',
+    ));
+
+    $wp_customize->add_control('header_layout', array(
+        'label'    => __('Header Layout', 'shopora-premium-commerce'),
+        'section'  => 'shopora_header_layout',
+        'type'     => 'select',
+        'choices'  => array(
+            'default' => __('Default', 'shopora-premium-commerce'),
+            'centered' => __('Centered', 'shopora-premium-commerce'),
+            'minimal' => __('Minimal', 'shopora-premium-commerce'),
+        ),
+    ));
+
     // Colors Panel
     $wp_customize->add_panel('shopora_colors', array(
         'title'    => __('Theme Colors', 'shopora-premium-commerce'),
-        'priority' => 25,
+        'priority' => 30,
     ));
-    
+
     // Primary Colors Section
     $wp_customize->add_section('shopora_primary_colors', array(
         'title'    => __('Primary Colors', 'shopora-premium-commerce'),
         'panel'    => 'shopora_colors',
         'priority' => 10,
     ));
-    
-    $wp_customize->add_setting('primary_color', array(
-        'default'           => '#7c3aed',
-        'sanitize_callback' => 'sanitize_hex_color',
-    ));
-    
-    $wp_customize->add_control(new WP_Customize_Color_Control($wp_customize, 'primary_color', array(
-        'label'    => __('Primary Color', 'shopora-premium-commerce'),
-        'section'  => 'shopora_primary_colors',
-    )));
-    
-    $wp_customize->add_setting('secondary_color', array(
-        'default'           => '#a855f7',
-        'sanitize_callback' => 'sanitize_hex_color',
-    ));
-    
-    $wp_customize->add_control(new WP_Customize_Color_Control($wp_customize, 'secondary_color', array(
-        'label'    => __('Secondary Color', 'shopora-premium-commerce'),
-        'section'  => 'shopora_primary_colors',
-    )));
-    
-    $wp_customize->add_setting('accent_color', array(
-        'default'           => '#f59e0b',
-        'sanitize_callback' => 'sanitize_hex_color',
-    ));
-    
-    $wp_customize->add_control(new WP_Customize_Color_Control($wp_customize, 'accent_color', array(
-        'label'    => __('Accent Color', 'shopora-premium-commerce'),
-        'section'  => 'shopora_primary_colors',
-    )));
-    
+
+    $color_settings = array(
+        'primary_color' => array(
+            'default' => '#7c3aed',
+            'label' => __('Primary Color', 'shopora-premium-commerce'),
+        ),
+        'secondary_color' => array(
+            'default' => '#a855f7',
+            'label' => __('Secondary Color', 'shopora-premium-commerce'),
+        ),
+        'accent_color' => array(
+            'default' => '#f59e0b',
+            'label' => __('Accent Color', 'shopora-premium-commerce'),
+        ),
+        'text_color' => array(
+            'default' => '#1e293b',
+            'label' => __('Text Color', 'shopora-premium-commerce'),
+        ),
+        'background_color' => array(
+            'default' => '#ffffff',
+            'label' => __('Background Color', 'shopora-premium-commerce'),
+        ),
+    );
+
+    foreach ($color_settings as $setting_id => $setting) {
+        $wp_customize->add_setting($setting_id, array(
+            'default'           => $setting['default'],
+            'sanitize_callback' => 'sanitize_hex_color',
+        ));
+
+        $wp_customize->add_control(new WP_Customize_Color_Control($wp_customize, $setting_id, array(
+            'label'    => $setting['label'],
+            'section'  => 'shopora_primary_colors',
+        )));
+    }
+
     // Typography Panel
     $wp_customize->add_panel('shopora_typography', array(
         'title'    => __('Typography', 'shopora-premium-commerce'),
-        'priority' => 30,
-    ));
-    
-    // Header Typography
-    $wp_customize->add_section('shopora_header_typography', array(
-        'title'    => __('Header Typography', 'shopora-premium-commerce'),
-        'panel'    => 'shopora_typography',
-    ));
-    
-    $wp_customize->add_setting('header_font_size', array(
-        'default'           => '16',
-        'sanitize_callback' => 'absint',
-    ));
-    
-    $wp_customize->add_control('header_font_size', array(
-        'label'    => __('Header Font Size (px)', 'shopora-premium-commerce'),
-        'section'  => 'shopora_header_typography',
-        'type'     => 'number',
-        'input_attrs' => array('min' => 12, 'max' => 24),
-    ));
-    
-    // Hero section
-    $wp_customize->add_section('shopora_hero', array(
-        'title'    => __('Hero Section', 'shopora-premium-commerce'),
         'priority' => 35,
     ));
-    
-    $wp_customize->add_setting('hero_enable', array(
-        'default'           => true,
-        'sanitize_callback' => 'wp_validate_boolean',
+
+    // Font Family Section
+    $wp_customize->add_section('shopora_font_families', array(
+        'title'    => __('Font Families', 'shopora-premium-commerce'),
+        'panel'    => 'shopora_typography',
     ));
-    
-    $wp_customize->add_control('hero_enable', array(
-        'label'    => __('Enable Hero Section', 'shopora-premium-commerce'),
-        'section'  => 'shopora_hero',
-        'type'     => 'checkbox',
-    ));
-    
-    $wp_customize->add_setting('hero_title', array(
-        'default'           => 'Premium Products for Modern Living',
+
+    $google_fonts = array(
+        'inherit' => __('Default', 'shopora-premium-commerce'),
+        'Inter' => 'Inter',
+        'Roboto' => 'Roboto',
+        'Open Sans' => 'Open Sans',
+        'Lato' => 'Lato',
+        'Montserrat' => 'Montserrat',
+        'Poppins' => 'Poppins',
+        'Nunito' => 'Nunito',
+        'Source Sans Pro' => 'Source Sans Pro',
+        'Playfair Display' => 'Playfair Display',
+        'Merriweather' => 'Merriweather',
+    );
+
+    $wp_customize->add_setting('heading_font_family', array(
+        'default'           => 'Inter',
         'sanitize_callback' => 'sanitize_text_field',
     ));
-    
-    $wp_customize->add_control('hero_title', array(
-        'label'    => __('Hero Title', 'shopora-premium-commerce'),
-        'section'  => 'shopora_hero',
-        'type'     => 'text',
+
+    $wp_customize->add_control('heading_font_family', array(
+        'label'    => __('Heading Font Family', 'shopora-premium-commerce'),
+        'section'  => 'shopora_font_families',
+        'type'     => 'select',
+        'choices'  => $google_fonts,
     ));
-    
-    $wp_customize->add_setting('hero_description', array(
-        'default'           => 'Discover our curated collection of high-quality products designed to enhance your lifestyle.',
-        'sanitize_callback' => 'sanitize_textarea_field',
+
+    $wp_customize->add_setting('body_font_family', array(
+        'default'           => 'Inter',
+        'sanitize_callback' => 'sanitize_text_field',
     ));
-    
-    $wp_customize->add_control('hero_description', array(
-        'label'    => __('Hero Description', 'shopora-premium-commerce'),
-        'section'  => 'shopora_hero',
-        'type'     => 'textarea',
+
+    $wp_customize->add_control('body_font_family', array(
+        'label'    => __('Body Font Family', 'shopora-premium-commerce'),
+        'section'  => 'shopora_font_families',
+        'type'     => 'select',
+        'choices'  => $google_fonts,
     ));
-    
-    $wp_customize->add_setting('hero_image', array(
-        'sanitize_callback' => 'esc_url_raw',
+
+    // Button Styles Section
+    $wp_customize->add_section('shopora_button_styles', array(
+        'title'    => __('Button Styles', 'shopora-premium-commerce'),
+        'panel'    => 'shopora_colors',
+        'priority' => 20,
     ));
-    
-    $wp_customize->add_control(new WP_Customize_Image_Control($wp_customize, 'hero_image', array(
-        'label'    => __('Hero Background Image', 'shopora-premium-commerce'),
-        'section'  => 'shopora_hero',
-    )));
-    
-    // Products Section
-    $wp_customize->add_section('shopora_products', array(
-        'title'    => __('Products Section', 'shopora-premium-commerce'),
+
+    $wp_customize->add_setting('button_border_radius', array(
+        'default'           => '8',
+        'sanitize_callback' => 'absint',
+    ));
+
+    $wp_customize->add_control('button_border_radius', array(
+        'label'    => __('Button Border Radius (px)', 'shopora-premium-commerce'),
+        'section'  => 'shopora_button_styles',
+        'type'     => 'range',
+        'input_attrs' => array('min' => 0, 'max' => 50, 'step' => 1),
+    ));
+
+    // Footer Panel
+    $wp_customize->add_panel('shopora_footer', array(
+        'title'    => __('Footer Settings', 'shopora-premium-commerce'),
         'priority' => 40,
     ));
-    
-    $wp_customize->add_setting('products_per_page', array(
-        'default'           => 15,
-        'sanitize_callback' => 'absint',
+
+    // Footer Content Section
+    $wp_customize->add_section('shopora_footer_content', array(
+        'title'    => __('Footer Content', 'shopora-premium-commerce'),
+        'panel'    => 'shopora_footer',
     ));
-    
-    $wp_customize->add_control('products_per_page', array(
-        'label'    => __('Products Per Page', 'shopora-premium-commerce'),
-        'section'  => 'shopora_products',
-        'type'     => 'number',
-        'input_attrs' => array('min' => 6, 'max' => 50),
-    ));
-    
-    $wp_customize->add_setting('shop_columns_desktop', array(
-        'default'           => 4,
-        'sanitize_callback' => 'absint',
-    ));
-    
-    $wp_customize->add_control('shop_columns_desktop', array(
-        'label'    => __('Desktop Columns (With Sidebar)', 'shopora-premium-commerce'),
-        'section'  => 'shopora_products',
-        'type'     => 'select',
-        'choices'  => array(
-            '3' => '3 Columns',
-            '4' => '4 Columns',
-            '5' => '5 Columns',
-            '6' => '6 Columns',
-        ),
-    ));
-    
-    $wp_customize->add_setting('shop_columns_desktop_no_sidebar', array(
-        'default'           => 6,
-        'sanitize_callback' => 'absint',
-    ));
-    
-    $wp_customize->add_control('shop_columns_desktop_no_sidebar', array(
-        'label'    => __('Desktop Columns (No Sidebar)', 'shopora-premium-commerce'),
-        'section'  => 'shopora_products',
-        'type'     => 'select',
-        'choices'  => array(
-            '4' => '4 Columns',
-            '5' => '5 Columns',
-            '6' => '6 Columns',
-            '7' => '7 Columns',
-            '8' => '8 Columns',
-        ),
-    ));
-    
-    $wp_customize->add_setting('shop_columns_tablet', array(
-        'default'           => 3,
-        'sanitize_callback' => 'absint',
-    ));
-    
-    $wp_customize->add_control('shop_columns_tablet', array(
-        'label'    => __('Tablet Columns', 'shopora-premium-commerce'),
-        'section'  => 'shopora_products',
-        'type'     => 'select',
-        'choices'  => array(
-            '2' => '2 Columns',
-            '3' => '3 Columns',
-            '4' => '4 Columns',
-        ),
-    ));
-    
-    $wp_customize->add_setting('shop_columns_mobile', array(
-        'default'           => 2,
-        'sanitize_callback' => 'absint',
-    ));
-    
-    $wp_customize->add_control('shop_columns_mobile', array(
-        'label'    => __('Mobile Columns', 'shopora-premium-commerce'),
-        'section'  => 'shopora_products',
-        'type'     => 'select',
-        'choices'  => array(
-            '1' => '1 Column',
-            '2' => '2 Columns',
-            '3' => '3 Columns',
-        ),
-    ));
-    
-    // Blog Layout Section
-    $wp_customize->add_section('shopora_blog_layout', array(
-        'title'    => __('Blog Layout', 'shopora-premium-commerce'),
-        'priority' => 42,
-    ));
-    
-    $wp_customize->add_setting('blog_layout', array(
-        'default'           => 'grid',
+
+    $wp_customize->add_setting('footer_copyright', array(
+        'default'           => '© 2024 Premium Commerce. All rights reserved.',
         'sanitize_callback' => 'sanitize_text_field',
     ));
-    
-    $wp_customize->add_control('blog_layout', array(
-        'label'    => __('Blog Layout Style', 'shopora-premium-commerce'),
-        'section'  => 'shopora_blog_layout',
-        'type'     => 'select',
-        'choices'  => array(
-            'grid' => 'Grid Layout',
-            'list' => 'List Layout',
-            'masonry' => 'Masonry Layout',
-        ),
-    ));
-    
-    $wp_customize->add_setting('blog_columns', array(
-        'default'           => 3,
-        'sanitize_callback' => 'absint',
-    ));
-    
-    $wp_customize->add_control('blog_columns', array(
-        'label'    => __('Blog Grid Columns', 'shopora-premium-commerce'),
-        'section'  => 'shopora_blog_layout',
-        'type'     => 'select',
-        'choices'  => array(
-            '2' => '2 Columns',
-            '3' => '3 Columns',
-            '4' => '4 Columns',
-        ),
-    ));
-    
-    $wp_customize->add_setting('posts_per_page_custom', array(
-        'default'           => 9,
-        'sanitize_callback' => 'absint',
-    ));
-    
-    $wp_customize->add_control('posts_per_page_custom', array(
-        'label'    => __('Posts Per Page', 'shopora-premium-commerce'),
-        'section'  => 'shopora_blog_layout',
-        'type'     => 'number',
-        'input_attrs' => array('min' => 3, 'max' => 20),
-    ));
-    
-    // Sidebar Visibility section
-    $wp_customize->add_section('shopora_sidebar', array(
-        'title'    => __('Sidebar Settings', 'shopora-premium-commerce'),
-        'priority' => 45,
-    ));
-    
-    $wp_customize->add_setting('sidebar_show_shop', array(
-        'default'           => true,
-        'sanitize_callback' => 'wp_validate_boolean',
-    ));
-    
-    $wp_customize->add_control('sidebar_show_shop', array(
-        'label'    => __('Show Sidebar on Shop Page', 'shopora-premium-commerce'),
-        'section'  => 'shopora_sidebar',
-        'type'     => 'checkbox',
-    ));
-    
-    $wp_customize->add_setting('sidebar_show_product', array(
-        'default'           => false,
-        'sanitize_callback' => 'wp_validate_boolean',
-    ));
-    
-    $wp_customize->add_control('sidebar_show_product', array(
-        'label'    => __('Show Sidebar on Product Pages', 'shopora-premium-commerce'),
-        'section'  => 'shopora_sidebar',
-        'type'     => 'checkbox',
-    ));
-    
-    $wp_customize->add_setting('sidebar_show_blog', array(
-        'default'           => true,
-        'sanitize_callback' => 'wp_validate_boolean',
-    ));
-    
-    $wp_customize->add_control('sidebar_show_blog', array(
-        'label'    => __('Show Sidebar on Blog Pages', 'shopora-premium-commerce'),
-        'section'  => 'shopora_sidebar',
-        'type'     => 'checkbox',
-    ));
-    
-    // Contact Information
-    $wp_customize->add_section('shopora_contact', array(
-        'title'    => __('Contact Information', 'shopora-premium-commerce'),
-        'priority' => 50,
-    ));
-    
-    $wp_customize->add_setting('contact_phone', array(
-        'default'           => '+1 (555) 123-4567',
-        'sanitize_callback' => 'sanitize_text_field',
-    ));
-    
-    $wp_customize->add_control('contact_phone', array(
-        'label'    => __('Phone Number', 'shopora-premium-commerce'),
-        'section'  => 'shopora_contact',
+
+    $wp_customize->add_control('footer_copyright', array(
+        'label'    => __('Copyright Text', 'shopora-premium-commerce'),
+        'section'  => 'shopora_footer_content',
         'type'     => 'text',
     ));
-    
-    $wp_customize->add_setting('contact_email', array(
-        'default'           => 'hello@premiumcommerce.com',
-        'sanitize_callback' => 'sanitize_email',
-    ));
-    
-    $wp_customize->add_control('contact_email', array(
-        'label'    => __('Email Address', 'shopora-premium-commerce'),
-        'section'  => 'shopora_contact',
-        'type'     => 'email',
-    ));
-    
-    $wp_customize->add_setting('contact_address', array(
-        'default'           => '123 Business Ave, Suite 100, City, State 12345',
-        'sanitize_callback' => 'sanitize_textarea_field',
-    ));
-    
-    $wp_customize->add_control('contact_address', array(
-        'label'    => __('Address', 'shopora-premium-commerce'),
-        'section'  => 'shopora_contact',
-        'type'     => 'textarea',
-    ));
-    
-    // Social Media
+
+    // Social Media Section
     $wp_customize->add_section('shopora_social', array(
         'title'    => __('Social Media', 'shopora-premium-commerce'),
-        'priority' => 55,
+        'panel'    => 'shopora_footer',
     ));
-    
+
     $social_networks = array(
         'facebook' => 'Facebook',
         'twitter' => 'Twitter',
         'instagram' => 'Instagram',
         'linkedin' => 'LinkedIn',
         'youtube' => 'YouTube',
+        'pinterest' => 'Pinterest',
     );
-    
+
     foreach ($social_networks as $network => $label) {
         $wp_customize->add_setting("social_{$network}", array(
             'sanitize_callback' => 'esc_url_raw',
         ));
-        
+
         $wp_customize->add_control("social_{$network}", array(
             'label'    => sprintf(__('%s URL', 'shopora-premium-commerce'), $label),
             'section'  => 'shopora_social',
             'type'     => 'url',
         ));
     }
-    
-    // Footer Settings
-    $wp_customize->add_section('shopora_footer', array(
-        'title'    => __('Footer Settings', 'shopora-premium-commerce'),
-        'priority' => 60,
+
+    // Homepage Settings
+    $wp_customize->add_section('shopora_homepage', array(
+        'title'    => __('Homepage Settings', 'shopora-premium-commerce'),
+        'priority' => 45,
     ));
-    
-    $wp_customize->add_setting('footer_copyright', array(
-        'default'           => '© 2024 Premium Commerce. All rights reserved.',
+
+    $wp_customize->add_setting('hero_enable', array(
+        'default'           => true,
+        'sanitize_callback' => 'wp_validate_boolean',
+    ));
+
+    $wp_customize->add_control('hero_enable', array(
+        'label'    => __('Enable Hero Section', 'shopora-premium-commerce'),
+        'section'  => 'shopora_homepage',
+        'type'     => 'checkbox',
+    ));
+
+    $wp_customize->add_setting('hero_title', array(
+        'default'           => 'Premium Products for Modern Living',
         'sanitize_callback' => 'sanitize_text_field',
     ));
-    
-    $wp_customize->add_control('footer_copyright', array(
-        'label'    => __('Copyright Text', 'shopora-premium-commerce'),
-        'section'  => 'shopora_footer',
+
+    $wp_customize->add_control('hero_title', array(
+        'label'    => __('Hero Title', 'shopora-premium-commerce'),
+        'section'  => 'shopora_homepage',
         'type'     => 'text',
+    ));
+
+    $wp_customize->add_setting('hero_description', array(
+        'default'           => 'Discover our curated collection of high-quality products designed to enhance your lifestyle.',
+        'sanitize_callback' => 'sanitize_textarea_field',
+    ));
+
+    $wp_customize->add_control('hero_description', array(
+        'label'    => __('Hero Description', 'shopora-premium-commerce'),
+        'section'  => 'shopora_homepage',
+        'type'     => 'textarea',
+    ));
+
+    $wp_customize->add_setting('hero_background_image', array(
+        'sanitize_callback' => 'esc_url_raw',
+    ));
+
+    $wp_customize->add_control(new WP_Customize_Image_Control($wp_customize, 'hero_background_image', array(
+        'label'    => __('Hero Background Image', 'shopora-premium-commerce'),
+        'section'  => 'shopora_homepage',
+    )));
+
+    // Blog Settings
+    $wp_customize->add_section('shopora_blog', array(
+        'title'    => __('Blog Settings', 'shopora-premium-commerce'),
+        'priority' => 50,
+    ));
+
+    $wp_customize->add_setting('blog_layout', array(
+        'default'           => 'grid',
+        'sanitize_callback' => 'sanitize_text_field',
+    ));
+
+    $wp_customize->add_control('blog_layout', array(
+        'label'    => __('Blog Layout', 'shopora-premium-commerce'),
+        'section'  => 'shopora_blog',
+        'type'     => 'select',
+        'choices'  => array(
+            'grid' => __('Grid Layout', 'shopora-premium-commerce'),
+            'list' => __('List Layout', 'shopora-premium-commerce'),
+            'masonry' => __('Masonry Layout', 'shopora-premium-commerce'),
+        ),
+    ));
+
+    $wp_customize->add_setting('posts_per_page_blog', array(
+        'default'           => 9,
+        'sanitize_callback' => 'absint',
+    ));
+
+    $wp_customize->add_control('posts_per_page_blog', array(
+        'label'    => __('Posts Per Page', 'shopora-premium-commerce'),
+        'section'  => 'shopora_blog',
+        'type'     => 'number',
+        'input_attrs' => array('min' => 3, 'max' => 20),
     ));
 }
 add_action('customize_register', 'shopora_customize_register');
@@ -543,93 +518,27 @@ function shopora_custom_styles() {
     $primary_color = get_theme_mod('primary_color', '#7c3aed');
     $secondary_color = get_theme_mod('secondary_color', '#a855f7');
     $accent_color = get_theme_mod('accent_color', '#f59e0b');
-    $header_font_size = get_theme_mod('header_font_size', 16);
-    $shop_columns_desktop = get_theme_mod('shop_columns_desktop', 4);
-    $shop_columns_desktop_no_sidebar = get_theme_mod('shop_columns_desktop_no_sidebar', 6);
-    $shop_columns_tablet = get_theme_mod('shop_columns_tablet', 3);
-    $shop_columns_mobile = get_theme_mod('shop_columns_mobile', 2);
-    
+    $text_color = get_theme_mod('text_color', '#1e293b');
+    $background_color = get_theme_mod('background_color', '#ffffff');
+    $heading_font = get_theme_mod('heading_font_family', 'Inter');
+    $body_font = get_theme_mod('body_font_family', 'Inter');
+    $button_radius = get_theme_mod('button_border_radius', 8);
+
     ?>
     <style type="text/css" id="shopora-custom-styles">
         :root {
             --primary-color: <?php echo esc_attr($primary_color); ?>;
             --secondary-color: <?php echo esc_attr($secondary_color); ?>;
             --accent-color: <?php echo esc_attr($accent_color); ?>;
+            --text-color: <?php echo esc_attr($text_color); ?>;
+            --background-color: <?php echo esc_attr($background_color); ?>;
+            --heading-font: '<?php echo esc_attr($heading_font); ?>', sans-serif;
+            --body-font: '<?php echo esc_attr($body_font); ?>', sans-serif;
+            --button-border-radius: <?php echo esc_attr($button_radius); ?>px;
         }
-        
-        .main-navigation,
-        .header-content .main-navigation ul li a {
-            font-size: <?php echo esc_attr($header_font_size); ?>px;
-        }
-        
-        /* Shop Grid Responsive */
-        .shop-layout.has-sidebar .woocommerce ul.products,
-        .shop-layout.has-sidebar .woocommerce .products {
-            grid-template-columns: repeat(<?php echo esc_attr($shop_columns_desktop); ?>, 1fr) !important;
-        }
-        
-        .shop-layout.no-sidebar .woocommerce ul.products,
-        .shop-layout.no-sidebar .woocommerce .products {
-            grid-template-columns: repeat(<?php echo esc_attr($shop_columns_desktop_no_sidebar); ?>, 1fr) !important;
-        }
-        
-        @media (max-width: 1024px) {
-            .woocommerce ul.products,
-            .woocommerce .products {
-                grid-template-columns: repeat(<?php echo esc_attr($shop_columns_tablet); ?>, 1fr) !important;
-            }
-        }
-        
-        @media (max-width: 768px) {
-            .woocommerce ul.products,
-            .woocommerce .products {
-                grid-template-columns: repeat(<?php echo esc_attr($shop_columns_mobile); ?>, 1fr) !important;
-            }
-        }
-        
-        /* Color Applications */
-        .btn-primary,
-        .woocommerce ul.products li.product .button,
-        .woocommerce div.product form.cart .single_add_to_cart_button,
-        button.single_add_to_cart_button.button.alt {
-            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%) !important;
-            color: var(--white) !important;
-        }
-        
-        .btn-primary:hover,
-        .woocommerce ul.products li.product .button:hover,
-        .woocommerce div.product form.cart .single_add_to_cart_button:hover,
-        button.single_add_to_cart_button.button.alt:hover {
-            background: linear-gradient(135deg, var(--secondary-color) 0%, var(--primary-color) 100%) !important;
-        }
-        
-        .woocommerce ul.products li.product .price,
-        .woocommerce div.product .price,
-        .price {
-            color: var(--primary-color) !important;
-            font-weight: 700 !important;
-        }
-        
-        .hero-section {
-            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
-        }
-        
-        .main-navigation a:hover,
-        .header-content .main-navigation ul li a:hover {
-            color: var(--primary-color) !important;
-        }
-        
-        /* Sidebar styling */
-        .filter-section h4,
-        .widget-title {
-            color: var(--text-dark) !important;
-            border-bottom: 2px solid var(--primary-color);
-            padding-bottom: 10px;
-        }
-        
-        .filter-section ul li a:hover {
-            background: rgba(<?php echo implode(',', sscanf($primary_color, "#%02x%02x%02x")); ?>, 0.1) !important;
-            color: var(--primary-color) !important;
+
+        .btn {
+            border-radius: var(--button-border-radius);
         }
     </style>
     <?php
@@ -641,17 +550,16 @@ add_action('wp_head', 'shopora_custom_styles', 999);
  */
 function shopora_show_sidebar() {
     if (is_shop() || is_product_category() || is_product_tag()) {
-        $sidebar_id = 'shop-sidebar';
-        $show_setting = get_theme_mod('sidebar_show_shop', true);
+        return get_theme_mod('sidebar_show_shop', true) && is_active_sidebar('shop-sidebar');
     } elseif (is_product()) {
-        $sidebar_id = 'shop-sidebar';
-        $show_setting = get_theme_mod('sidebar_show_product', false);
-    } else {
-        $sidebar_id = 'sidebar-1';
-        $show_setting = get_theme_mod('sidebar_show_blog', true);
+        return get_theme_mod('sidebar_show_product', false) && is_active_sidebar('shop-sidebar');
+    } elseif (is_home() || is_archive() || is_search()) {
+        return get_theme_mod('sidebar_show_blog', true) && is_active_sidebar('sidebar-1');
+    } elseif (is_page()) {
+        return get_theme_mod('sidebar_show_page', false) && is_active_sidebar('sidebar-1');
     }
-    
-    return $show_setting && is_active_sidebar($sidebar_id);
+
+    return is_active_sidebar('sidebar-1');
 }
 
 /**
@@ -665,192 +573,16 @@ function shopora_get_sidebar_id() {
 }
 
 /**
- * WooCommerce modifications
- */
-function shopora_woocommerce_init() {
-    // Remove default WooCommerce styles
-    add_filter('woocommerce_enqueue_styles', '__return_empty_array');
-    
-    // Change products per page
-    add_filter('loop_shop_per_page', function() {
-        return get_theme_mod('products_per_page', 15);
-    });
-    
-    // Remove default WooCommerce breadcrumbs
-    remove_action('woocommerce_before_main_content', 'woocommerce_breadcrumb', 20);
-    
-    // Remove default WooCommerce result count and catalog ordering
-    remove_action('woocommerce_before_shop_loop', 'woocommerce_output_all_notices', 10);
-    remove_action('woocommerce_before_shop_loop', 'woocommerce_result_count', 20);
-    remove_action('woocommerce_before_shop_loop', 'woocommerce_catalog_ordering', 30);
-    
-    // Add custom shop toolbar
-    add_action('woocommerce_before_shop_loop', 'shopora_shop_toolbar', 20);
-    
-    // Fix loop columns
-    add_filter('loop_shop_columns', 'shopora_loop_columns');
-    
-    // Ensure proper product display
-    add_filter('woocommerce_output_related_products_args', 'shopora_related_products_args', 20);
-    add_filter('woocommerce_cross_sells_total', 'shopora_change_cross_sells_product_no');
-    add_filter('woocommerce_cross_sells_columns', 'shopora_change_cross_sells_columns');
-    
-    // Ensure products show in archive
-    add_action('pre_get_posts', 'shopora_pre_get_posts_shop');
-}
-add_action('after_setup_theme', 'shopora_woocommerce_init');
-
-/**
- * Ensure products show in shop page
- */
-function shopora_pre_get_posts_shop($query) {
-    if (!is_admin() && $query->is_main_query()) {
-        if (is_shop()) {
-            $query->set('post_type', 'product');
-            $query->set('posts_per_page', get_theme_mod('products_per_page', 15));
-        }
-    }
-}
-
-/**
- * Set loop columns based on sidebar
- */
-function shopora_loop_columns() {
-    if (shopora_show_sidebar()) {
-        return get_theme_mod('shop_columns_desktop', 4);
-    } else {
-        return get_theme_mod('shop_columns_desktop_no_sidebar', 6);
-    }
-}
-
-/**
- * Change related products args
- */
-function shopora_related_products_args($args) {
-    $args['posts_per_page'] = 6;
-    $args['columns'] = 6;
-    return $args;
-}
-
-/**
- * Change cross sells product number
- */
-function shopora_change_cross_sells_product_no($columns) {
-    return 6;
-}
-
-/**
- * Change cross sells columns
- */
-function shopora_change_cross_sells_columns($columns) {
-    return 6;
-}
-
-/**
- * Custom shop toolbar
- */
-function shopora_shop_toolbar() {
-    ?>
-    <div class="shop-toolbar">
-        <?php woocommerce_result_count(); ?>
-        <?php woocommerce_catalog_ordering(); ?>
-    </div>
-    <?php
-}
-
-/**
- * Add custom search widget for shop sidebar
- */
-class Shopora_Product_Search_Widget extends WP_Widget {
-    function __construct() {
-        parent::__construct(
-            'shopora_product_search',
-            __('Shop Search', 'shopora-premium-commerce'),
-            array('description' => __('Product search form for shop sidebar', 'shopora-premium-commerce'))
-        );
-    }
-    
-    public function widget($args, $instance) {
-        echo $args['before_widget'];
-        if (!empty($instance['title'])) {
-            echo $args['before_title'] . apply_filters('widget_title', $instance['title']) . $args['after_title'];
-        }
-        ?>
-        <div class="search-section">
-            <form role="search" method="get" action="<?php echo esc_url(home_url('/')); ?>" class="product-search-form">
-                <div class="search-wrapper">
-                    <input type="search" class="search-field" placeholder="<?php echo esc_attr_x('Search products...', 'placeholder', 'shopora-premium-commerce'); ?>" value="<?php echo get_search_query(); ?>" name="s" autocomplete="off" />
-                    <input type="hidden" name="post_type" value="product" />
-                    <button type="submit" class="search-submit" aria-label="Search">
-                        <i class="fas fa-search"></i>
-                    </button>
-                </div>
-            </form>
-        </div>
-        <?php
-        echo $args['after_widget'];
-    }
-    
-    public function form($instance) {
-        $title = !empty($instance['title']) ? $instance['title'] : __('Search Products', 'shopora-premium-commerce');
-        ?>
-        <p>
-            <label for="<?php echo esc_attr($this->get_field_id('title')); ?>"><?php _e('Title:', 'shopora-premium-commerce'); ?></label>
-            <input class="widefat" id="<?php echo esc_attr($this->get_field_id('title')); ?>" name="<?php echo esc_attr($this->get_field_name('title')); ?>" type="text" value="<?php echo esc_attr($title); ?>">
-        </p>
-        <?php
-    }
-    
-    public function update($new_instance, $old_instance) {
-        $instance = array();
-        $instance['title'] = (!empty($new_instance['title'])) ? sanitize_text_field($new_instance['title']) : '';
-        return $instance;
-    }
-}
-
-function shopora_register_widgets() {
-    register_widget('Shopora_Product_Search_Widget');
-}
-add_action('widgets_init', 'shopora_register_widgets');
-
-/**
- * Populate shop sidebar with default widgets if empty
- */
-function shopora_populate_shop_sidebar() {
-    if (!is_active_sidebar('shop-sidebar')) {
-        // Add default widgets programmatically
-        $widget_options = array(
-            'title' => __('Search Products', 'shopora-premium-commerce')
-        );
-        
-        update_option('widget_shopora_product_search', array(
-            2 => $widget_options
-        ));
-        
-        $sidebars_widgets = get_option('sidebars_widgets');
-        if (!isset($sidebars_widgets['shop-sidebar'])) {
-            $sidebars_widgets['shop-sidebar'] = array();
-        }
-        
-        if (empty($sidebars_widgets['shop-sidebar'])) {
-            $sidebars_widgets['shop-sidebar'] = array(
-                'shopora_product_search-2'
-            );
-            update_option('sidebars_widgets', $sidebars_widgets);
-        }
-    }
-}
-add_action('wp_loaded', 'shopora_populate_shop_sidebar');
-
-/**
- * Load WooCommerce compatibility file
+ * WooCommerce setup and modifications
  */
 if (class_exists('WooCommerce')) {
-    add_action('after_setup_theme', 'shopora_woocommerce_setup');
-    
+
+    /**
+     * WooCommerce theme setup
+     */
     function shopora_woocommerce_setup() {
         add_theme_support('woocommerce', array(
-            'thumbnail_image_width' => 300,
+            'thumbnail_image_width' => 400,
             'single_image_width'    => 600,
             'product_grid'          => array(
                 'default_rows'    => 3,
@@ -858,61 +590,101 @@ if (class_exists('WooCommerce')) {
                 'max_rows'        => 8,
                 'default_columns' => 4,
                 'min_columns'     => 2,
-                'max_columns'     => 5,
+                'max_columns'     => 6,
             ),
         ));
-        
-        add_theme_support('wc-product-gallery-zoom');
-        add_theme_support('wc-product-gallery-lightbox');
-        add_theme_support('wc-product-gallery-slider');
+
+        // Remove default WooCommerce styles
+        add_filter('woocommerce_enqueue_styles', '__return_empty_array');
+
+        // Modify products per page
+        add_filter('loop_shop_per_page', function() {
+            return get_theme_mod('products_per_page', 12);
+        });
+
+        // Remove default actions and add custom ones
+        remove_action('woocommerce_before_main_content', 'woocommerce_breadcrumb', 20);
+        remove_action('woocommerce_before_shop_loop', 'woocommerce_output_all_notices', 10);
+
+        // Add custom shop toolbar
+        add_action('woocommerce_before_shop_loop', 'shopora_shop_toolbar', 20);
+    }
+    add_action('after_setup_theme', 'shopora_woocommerce_setup');
+
+    /**
+     * Custom shop toolbar
+     */
+    function shopora_shop_toolbar() {
+        ?>
+        <div class="shop-toolbar">
+            <div class="toolbar-left">
+                <?php woocommerce_result_count(); ?>
+            </div>
+            <div class="toolbar-right">
+                <?php woocommerce_catalog_ordering(); ?>
+            </div>
+        </div>
+        <?php
     }
 }
 
 /**
- * Disable WooCommerce block styles
- */
-function shopora_disable_woocommerce_block_styles() {
-    wp_dequeue_style('wc-blocks-style');
-    wp_dequeue_style('wc-blocks-style-active-filters');
-    wp_dequeue_style('wc-blocks-style-add-to-cart-form');
-    wp_dequeue_style('wc-blocks-style-all-products');
-    wp_dequeue_style('wc-blocks-style-all-reviews');
-    wp_dequeue_style('wc-blocks-style-attribute-filter');
-    wp_dequeue_style('wc-blocks-style-breadcrumbs');
-    wp_dequeue_style('wc-blocks-style-catalog-sorting');
-    wp_dequeue_style('wc-blocks-style-customer-account');
-    wp_dequeue_style('wc-blocks-style-featured-category');
-    wp_dequeue_style('wc-blocks-style-featured-product');
-    wp_dequeue_style('wc-blocks-style-mini-cart');
-    wp_dequeue_style('wc-blocks-style-price-filter');
-    wp_dequeue_style('wc-blocks-style-product-add-to-cart');
-    wp_dequeue_style('wc-blocks-style-product-button');
-    wp_dequeue_style('wc-blocks-style-product-categories');
-    wp_dequeue_style('wc-blocks-style-product-image');
-    wp_dequeue_style('wc-blocks-style-product-image-gallery');
-    wp_dequeue_style('wc-blocks-style-product-query');
-    wp_dequeue_style('wc-blocks-style-product-results-count');
-    wp_dequeue_style('wc-blocks-style-product-reviews');
-    wp_dequeue_style('wc-blocks-style-product-sale-badge');
-    wp_dequeue_style('wc-blocks-style-product-search');
-    wp_dequeue_style('wc-blocks-style-product-sku');
-    wp_dequeue_style('wc-blocks-style-product-stock-indicator');
-    wp_dequeue_style('wc-blocks-style-product-summary');
-    wp_dequeue_style('wc-blocks-style-product-title');
-    wp_dequeue_style('wc-blocks-style-rating-filter');
-    wp_dequeue_style('wc-blocks-style-reviews-by-category');
-    wp_dequeue_style('wc-blocks-style-reviews-by-product');
-    wp_dequeue_style('wc-blocks-style-product-details');
-    wp_dequeue_style('wc-blocks-style-single-product');
-    wp_dequeue_style('wc-blocks-style-stock-filter');
-    wp_dequeue_style('wc-blocks-style-cart');
-    wp_dequeue_style('wc-blocks-style-checkout');
-    wp_dequeue_style('wc-blocks-style-mini-cart-contents');
-}
-add_action('wp_enqueue_scripts', 'shopora_disable_woocommerce_block_styles', 100);
-
-/**
- * Include template tags
+ * Include additional files
  */
 require get_template_directory() . '/inc/template-tags.php';
+
+/**
+ * Add theme update checker (for premium themes)
+ */
+function shopora_check_for_updates() {
+    // Theme update logic would go here
+    // This is where you'd implement automatic updates for premium themes
+}
+
+/**
+ * Optimize theme performance
+ */
+function shopora_optimize_performance() {
+    // Remove unnecessary WordPress features
+    remove_action('wp_head', 'wp_generator');
+    remove_action('wp_head', 'wlwmanifest_link');
+    remove_action('wp_head', 'rsd_link');
+
+    // Remove emoji scripts
+    remove_action('wp_head', 'print_emoji_detection_script', 7);
+    remove_action('wp_print_styles', 'print_emoji_styles');
+
+    // Defer non-critical CSS
+    add_filter('style_loader_tag', 'shopora_defer_non_critical_css', 10, 2);
+}
+add_action('init', 'shopora_optimize_performance');
+
+/**
+ * Defer non-critical CSS
+ */
+function shopora_defer_non_critical_css($tag, $handle) {
+    $defer_styles = array('font-awesome');
+
+    if (in_array($handle, $defer_styles)) {
+        return str_replace('rel=\'stylesheet\'', 'rel=\'preload\' as=\'style\' onload=\'this.onload=null;this.rel="stylesheet"\'', $tag);
+    }
+
+    return $tag;
+}
+
+/**
+ * Add schema markup for SEO
+ */
+function shopora_add_schema_markup() {
+    if (is_home() || is_front_page()) {
+        echo '<script type="application/ld+json">' . wp_json_encode(array(
+            '@context' => 'https://schema.org',
+            '@type' => 'WebSite',
+            'name' => get_bloginfo('name'),
+            'description' => get_bloginfo('description'),
+            'url' => home_url('/'),
+        )) . '</script>';
+    }
+}
+add_action('wp_head', 'shopora_add_schema_markup');
 ?>
