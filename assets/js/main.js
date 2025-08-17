@@ -153,6 +153,58 @@
     }
 
     /**
+     * Mobile Navigation Toggle
+     */
+    $('.mobile-menu-btn').on('click', function() {
+        const $nav = $('.main-navigation');
+        const $btn = $(this);
+        const isExpanded = $btn.attr('aria-expanded') === 'true';
+        
+        if (isExpanded) {
+            $nav.slideUp(300);
+            $btn.attr('aria-expanded', 'false');
+            $btn.removeClass('active');
+        } else {
+            $nav.slideDown(300);
+            $btn.attr('aria-expanded', 'true');
+            $btn.addClass('active');
+        }
+    });
+
+    /**
+     * Search Toggle
+     */
+    $('.search-toggle-btn').on('click', function() {
+        const $searchContainer = $('.search-form-container');
+        const $btn = $(this);
+        const isExpanded = $btn.attr('aria-expanded') === 'true';
+        
+        if (isExpanded) {
+            $searchContainer.slideUp(300);
+            $btn.attr('aria-expanded', 'false');
+            $btn.removeClass('active');
+        } else {
+            $searchContainer.slideDown(300);
+            $btn.attr('aria-expanded', 'true');
+            $btn.addClass('active');
+            // Focus on search field
+            setTimeout(() => {
+                $searchContainer.find('.search-field').focus();
+            }, 350);
+        }
+    });
+
+    /**
+     * Close search when clicking outside
+     */
+    $(document).on('click', function(e) {
+        if (!$(e.target).closest('.search-toggle, .search-form-container').length) {
+            $('.search-form-container').slideUp(300);
+            $('.search-toggle-btn').attr('aria-expanded', 'false').removeClass('active');
+        }
+    });
+
+    /**
      * Cart functionality (if WooCommerce is active)
      */
     if (typeof wc_add_to_cart_params !== 'undefined') {
@@ -167,6 +219,56 @@
             showNotification('Product added to cart!', 'success');
         });
     }
+
+    /**
+     * Responsive navigation for mobile
+     */
+    function handleResponsiveNav() {
+        if ($(window).width() <= 1024) {
+            $('.main-navigation').hide();
+        } else {
+            $('.main-navigation').show();
+            $('.mobile-menu-btn').attr('aria-expanded', 'false').removeClass('active');
+        }
+    }
+
+    // Check on load and resize
+    handleResponsiveNav();
+    $(window).on('resize', handleResponsiveNav);
+
+    /**
+     * Smooth scrolling for anchor links
+     */
+    $('a[href^="#"]').on('click', function(e) {
+        const target = $(this.getAttribute('href'));
+        if (target.length) {
+            e.preventDefault();
+            $('html, body').animate({
+                scrollTop: target.offset().top - 80
+            }, 600);
+        }
+    });
+
+    /**
+     * Enhanced contact form handling
+     */
+    $('#contact-form').on('submit', function(e) {
+        e.preventDefault();
+        
+        const $form = $(this);
+        const $submitBtn = $form.find('button[type="submit"]');
+        const originalText = $submitBtn.html();
+        
+        // Show loading state
+        $submitBtn.html('<i class="fas fa-spinner fa-spin"></i> Sending...').prop('disabled', true);
+        
+        // Simulate form submission (replace with actual AJAX call)
+        setTimeout(() => {
+            showNotification('Message sent successfully!', 'success');
+            $form[0].reset();
+            $submitBtn.html(originalText).prop('disabled', false);
+        }, 2000);
+    });
 
     /**
      * Show notification

@@ -302,7 +302,7 @@ function shopora_customize_register($wp_customize) {
     ));
     
     $wp_customize->add_control('shop_columns_desktop', array(
-        'label'    => __('Desktop Columns (Sidebar Enabled)', 'shopora-premium-commerce'),
+        'label'    => __('Desktop Columns (With Sidebar)', 'shopora-premium-commerce'),
         'section'  => 'shopora_products',
         'type'     => 'select',
         'choices'  => array(
@@ -327,11 +327,12 @@ function shopora_customize_register($wp_customize) {
             '5' => '5 Columns',
             '6' => '6 Columns',
             '7' => '7 Columns',
+            '8' => '8 Columns',
         ),
     ));
     
     $wp_customize->add_setting('shop_columns_tablet', array(
-        'default'           => 4,
+        'default'           => 3,
         'sanitize_callback' => 'absint',
     ));
     
@@ -360,6 +361,56 @@ function shopora_customize_register($wp_customize) {
             '2' => '2 Columns',
             '3' => '3 Columns',
         ),
+    ));
+    
+    // Blog Layout Section
+    $wp_customize->add_section('shopora_blog_layout', array(
+        'title'    => __('Blog Layout', 'shopora-premium-commerce'),
+        'priority' => 42,
+    ));
+    
+    $wp_customize->add_setting('blog_layout', array(
+        'default'           => 'grid',
+        'sanitize_callback' => 'sanitize_text_field',
+    ));
+    
+    $wp_customize->add_control('blog_layout', array(
+        'label'    => __('Blog Layout Style', 'shopora-premium-commerce'),
+        'section'  => 'shopora_blog_layout',
+        'type'     => 'select',
+        'choices'  => array(
+            'grid' => 'Grid Layout',
+            'list' => 'List Layout',
+            'masonry' => 'Masonry Layout',
+        ),
+    ));
+    
+    $wp_customize->add_setting('blog_columns', array(
+        'default'           => 3,
+        'sanitize_callback' => 'absint',
+    ));
+    
+    $wp_customize->add_control('blog_columns', array(
+        'label'    => __('Blog Grid Columns', 'shopora-premium-commerce'),
+        'section'  => 'shopora_blog_layout',
+        'type'     => 'select',
+        'choices'  => array(
+            '2' => '2 Columns',
+            '3' => '3 Columns',
+            '4' => '4 Columns',
+        ),
+    ));
+    
+    $wp_customize->add_setting('posts_per_page_custom', array(
+        'default'           => 9,
+        'sanitize_callback' => 'absint',
+    ));
+    
+    $wp_customize->add_control('posts_per_page_custom', array(
+        'label'    => __('Posts Per Page', 'shopora-premium-commerce'),
+        'section'  => 'shopora_blog_layout',
+        'type'     => 'number',
+        'input_attrs' => array('min' => 3, 'max' => 20),
     ));
     
     // Sidebar Visibility section
