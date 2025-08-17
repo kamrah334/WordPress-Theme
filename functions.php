@@ -394,7 +394,7 @@ function shopora_customize_register($wp_customize) {
     
     // Show sidebar on home page
     $wp_customize->add_setting('sidebar_show_home', array(
-        'default'           => true,
+        'default'           => false,
         'sanitize_callback' => 'wp_validate_boolean',
     ));
     
@@ -406,7 +406,7 @@ function shopora_customize_register($wp_customize) {
     
     // Show sidebar on shop page
     $wp_customize->add_setting('sidebar_show_shop', array(
-        'default'           => true,
+        'default'           => false,
         'sanitize_callback' => 'wp_validate_boolean',
     ));
     
@@ -430,7 +430,7 @@ function shopora_customize_register($wp_customize) {
     
     // Show sidebar on blog pages
     $wp_customize->add_setting('sidebar_show_blog', array(
-        'default'           => true,
+        'default'           => false,
         'sanitize_callback' => 'wp_validate_boolean',
     ));
     
@@ -442,7 +442,7 @@ function shopora_customize_register($wp_customize) {
     
     // Show sidebar on single posts
     $wp_customize->add_setting('sidebar_show_single_post', array(
-        'default'           => true,
+        'default'           => false,
         'sanitize_callback' => 'wp_validate_boolean',
     ));
     
@@ -466,7 +466,7 @@ function shopora_customize_register($wp_customize) {
     
     // Show sidebar on archive pages
     $wp_customize->add_setting('sidebar_show_archive', array(
-        'default'           => true,
+        'default'           => false,
         'sanitize_callback' => 'wp_validate_boolean',
     ));
     
@@ -478,7 +478,7 @@ function shopora_customize_register($wp_customize) {
     
     // Show sidebar on search results
     $wp_customize->add_setting('sidebar_show_search', array(
-        'default'           => true,
+        'default'           => false,
         'sanitize_callback' => 'wp_validate_boolean',
     ));
     
@@ -566,25 +566,25 @@ function shopora_show_sidebar() {
     
     // Check customizer settings for different page types
     if (is_front_page()) {
-        return get_theme_mod('sidebar_show_home', true);
+        return get_theme_mod('sidebar_show_home', false);
     } elseif (is_shop() || is_product_category() || is_product_tag()) {
-        return get_theme_mod('sidebar_show_shop', true);
+        return get_theme_mod('sidebar_show_shop', false);
     } elseif (is_product()) {
         return get_theme_mod('sidebar_show_product', false);
     } elseif (is_home() || is_category() || is_tag()) {
-        return get_theme_mod('sidebar_show_blog', true);
+        return get_theme_mod('sidebar_show_blog', false);
     } elseif (is_single() && get_post_type() === 'post') {
-        return get_theme_mod('sidebar_show_single_post', true);
+        return get_theme_mod('sidebar_show_single_post', false);
     } elseif (is_page()) {
         return get_theme_mod('sidebar_show_pages', false);
     } elseif (is_archive()) {
-        return get_theme_mod('sidebar_show_archive', true);
+        return get_theme_mod('sidebar_show_archive', false);
     } elseif (is_search()) {
-        return get_theme_mod('sidebar_show_search', true);
+        return get_theme_mod('sidebar_show_search', false);
     }
     
-    // Default to showing sidebar
-    return true;
+    // Default to not showing sidebar
+    return false;
 }
 
 /**
