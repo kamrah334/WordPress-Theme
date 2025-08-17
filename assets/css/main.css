@@ -1098,33 +1098,36 @@
 }
 
 .shop-layout {
-    display: grid;
+    display: flex;
     gap: 30px;
-    align-items: start;
+    align-items: flex-start;
     width: 100%;
     max-width: 100%;
 }
 
 .shop-layout.has-sidebar {
-    grid-template-columns: 300px 1fr;
+    flex-direction: row;
 }
 
 .shop-layout.no-sidebar {
-    grid-template-columns: 1fr;
+    flex-direction: column;
 }
 
 .shop-sidebar {
     position: sticky;
     top: 20px;
     height: fit-content;
-    width: 300px;
+    width: 280px;
     flex-shrink: 0;
+    order: 1;
 }
 
 .shop-main {
-    min-width: 0; /* Prevents grid blowout */
+    flex: 1;
+    min-width: 0;
     width: 100%;
     overflow: hidden;
+    order: 2;
 }
 
 /* Ensure products container doesn't overflow */
@@ -1158,41 +1161,34 @@
 }
 
 @media (max-width: 1400px) {
-    .shop-layout.has-sidebar {
-        grid-template-columns: 280px 1fr;
-        gap: 25px;
+    .shop-sidebar {
+        width: 260px;
     }
     
-    .shop-sidebar {
-        width: 280px;
+    .shop-layout {
+        gap: 25px;
     }
 }
 
 @media (max-width: 1200px) {
-    .shop-layout.has-sidebar {
-        grid-template-columns: 260px 1fr;
-        gap: 20px;
+    .shop-sidebar {
+        width: 240px;
     }
     
-    .shop-sidebar {
-        width: 260px;
+    .shop-layout {
+        gap: 20px;
     }
 }
 
 @media (max-width: 1024px) {
-    .shop-layout.has-sidebar {
-        grid-template-columns: 240px 1fr;
-        gap: 20px;
-    }
-    
     .shop-sidebar {
-        width: 240px;
+        width: 220px;
     }
 }
 
 @media (max-width: 768px) {
     .shop-layout.has-sidebar {
-        grid-template-columns: 1fr;
+        flex-direction: column;
         gap: 25px;
     }
     
@@ -1221,19 +1217,30 @@
     justify-content: space-between;
     align-items: center;
     margin-bottom: 30px;
-    padding: 20px;
-    background: #f8fafc;
+    padding: 15px 20px;
+    background: white;
     border-radius: 8px;
     border: 1px solid #e5e7eb;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
 }
 
 .shop-toolbar .woocommerce-result-count {
     font-weight: 600;
     color: #1e293b;
+    font-size: 0.95rem;
 }
 
 .shop-toolbar .woocommerce-ordering {
     margin: 0;
+}
+
+.shop-toolbar .woocommerce-ordering select {
+    padding: 8px 12px;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    background: white;
+    font-size: 0.9rem;
+    color: #1e293b;
 }
 
 /* No Products Found */

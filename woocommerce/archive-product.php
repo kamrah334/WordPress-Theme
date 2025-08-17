@@ -32,24 +32,27 @@ get_header('shop');
 
         <div class="shop-layout <?php echo shopora_show_sidebar() ? 'has-sidebar' : 'no-sidebar'; ?>">
             <?php if (shopora_show_sidebar()) : ?>
-                <div class="shop-sidebar">
+                <aside class="shop-sidebar">
                     <?php get_sidebar(); ?>
-                </div>
+                </aside>
             <?php endif; ?>
             
-            <div class="shop-main">
-                <div class="shop-toolbar">
-                    <?php
-                    /**
-                     * Hook: woocommerce_before_shop_loop.
-                     *
-                     * @hooked woocommerce_output_all_notices - 10
-                     * @hooked woocommerce_result_count - 20
-                     * @hooked woocommerce_catalog_ordering - 30
-                     */
-                    do_action('woocommerce_before_shop_loop');
-                    ?>
-                </div>
+            <main class="shop-main">
+                <?php
+                /**
+                 * Hook: woocommerce_before_shop_loop.
+                 *
+                 * @hooked woocommerce_output_all_notices - 10
+                 * @hooked woocommerce_result_count - 20
+                 * @hooked woocommerce_catalog_ordering - 30
+                 */
+                if (woocommerce_product_loop()) {
+                    echo '<div class="shop-toolbar">';
+                    woocommerce_result_count();
+                    woocommerce_catalog_ordering();
+                    echo '</div>';
+                }
+                ?>
 
                 <?php
                 if (woocommerce_product_loop()) {
@@ -85,7 +88,7 @@ get_header('shop');
                     echo '</div>';
                 }
                 ?>
-            </div>
+            </main>
         </div>
     </div>
 </div>
