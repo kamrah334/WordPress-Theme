@@ -694,8 +694,23 @@ function shopora_woocommerce_init() {
     add_filter('woocommerce_output_related_products_args', 'shopora_related_products_args', 20);
     add_filter('woocommerce_cross_sells_total', 'shopora_change_cross_sells_product_no');
     add_filter('woocommerce_cross_sells_columns', 'shopora_change_cross_sells_columns');
+    
+    // Ensure products show in archive
+    add_action('pre_get_posts', 'shopora_pre_get_posts_shop');
 }
 add_action('after_setup_theme', 'shopora_woocommerce_init');
+
+/**
+ * Ensure products show in shop page
+ */
+function shopora_pre_get_posts_shop($query) {
+    if (!is_admin() && $query->is_main_query()) {
+        if (is_shop()) {
+            $query->set('post_type', 'product');
+            $query->set('posts_per_page', get_theme_mod('products_per_page', 15));
+        }
+    }
+}
 
 /**
  * Set loop columns based on sidebar
@@ -764,9 +779,9 @@ class Shopora_Product_Search_Widget extends WP_Widget {
         <div class="search-section">
             <form role="search" method="get" action="<?php echo esc_url(home_url('/')); ?>" class="product-search-form">
                 <div class="search-wrapper">
-                    <input type="search" class="search-field" placeholder="<?php echo esc_attr_x('Search products...', 'placeholder', 'shopora-premium-commerce'); ?>" value="<?php echo get_search_query(); ?>" name="s" />
+                    <input type="search" class="search-field" placeholder="<?php echo esc_attr_x('Search products...', 'placeholder', 'shopora-premium-commerce'); ?>" value="<?php echo get_search_query(); ?>" name="s" autocomplete="off" />
                     <input type="hidden" name="post_type" value="product" />
-                    <button type="submit" class="search-submit">
+                    <button type="submit" class="search-submit" aria-label="Search">
                         <i class="fas fa-search"></i>
                     </button>
                 </div>
