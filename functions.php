@@ -654,8 +654,28 @@ function shopora_woocommerce_init() {
     
     // Remove default WooCommerce breadcrumbs
     remove_action('woocommerce_before_main_content', 'woocommerce_breadcrumb', 20);
+    
+    // Remove default WooCommerce result count and catalog ordering
+    remove_action('woocommerce_before_shop_loop', 'woocommerce_output_all_notices', 10);
+    remove_action('woocommerce_before_shop_loop', 'woocommerce_result_count', 20);
+    remove_action('woocommerce_before_shop_loop', 'woocommerce_catalog_ordering', 30);
+    
+    // Add custom shop toolbar
+    add_action('woocommerce_before_shop_loop', 'shopora_shop_toolbar', 20);
 }
 add_action('init', 'shopora_woocommerce_init');
+
+/**
+ * Custom shop toolbar
+ */
+function shopora_shop_toolbar() {
+    ?>
+    <div class="shop-toolbar">
+        <?php woocommerce_result_count(); ?>
+        <?php woocommerce_catalog_ordering(); ?>
+    </div>
+    <?php
+}
 
 /**
  * Add custom search widget for shop sidebar

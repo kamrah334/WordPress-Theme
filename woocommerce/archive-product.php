@@ -9,59 +9,46 @@ defined('ABSPATH') || exit;
 
 get_header('shop');
 
+/**
+ * Hook: woocommerce_before_main_content.
+ */
+do_action('woocommerce_before_main_content');
 ?>
+
 <div class="shop-container">
     <div class="container">
-
-        <header class="woocommerce-products-header">
-            <?php if (apply_filters('woocommerce_show_page_title', true)) : ?>
+        <?php if (apply_filters('woocommerce_show_page_title', true)) : ?>
+            <header class="woocommerce-products-header">
                 <h1 class="woocommerce-products-header__title page-title"><?php woocommerce_page_title(); ?></h1>
-                <p>Discover our premium collection of carefully curated products</p>
-            <?php endif; ?>
-
-            <?php
-            /**
-             * Hook: woocommerce_archive_description.
-             *
-             * @hooked woocommerce_taxonomy_archive_description - 10
-             * @hooked woocommerce_product_archive_description - 10
-             */
-            do_action('woocommerce_archive_description');
-            ?>
-        </header>
+                <?php
+                /**
+                 * Hook: woocommerce_archive_description.
+                 */
+                do_action('woocommerce_archive_description');
+                ?>
+                <p><?php esc_html_e('Discover our premium collection of carefully curated products', 'shopora-premium-commerce'); ?></p>
+            </header>
+        <?php endif; ?>
 
         <div class="shop-layout <?php echo shopora_show_sidebar() ? 'has-sidebar' : 'no-sidebar'; ?>">
             <?php if (shopora_show_sidebar()) : ?>
                 <aside class="shop-sidebar">
-                    <?php get_sidebar(); ?>
+                    <?php dynamic_sidebar(shopora_get_sidebar_id()); ?>
                 </aside>
             <?php endif; ?>
-            
-            <main class="shop-main">
+
+            <div class="shop-main">
                 <?php
                 /**
                  * Hook: woocommerce_before_shop_loop.
-                 *
-                 * @hooked woocommerce_output_all_notices - 10
-                 * @hooked woocommerce_result_count - 20
-                 * @hooked woocommerce_catalog_ordering - 30
                  */
-                if (woocommerce_product_loop()) {
-                    echo '<div class="shop-toolbar">';
-                    woocommerce_result_count();
-                    woocommerce_catalog_ordering();
-                    echo '</div>';
-                }
-                ?>
+                do_action('woocommerce_before_shop_loop');
 
-                <?php
-                if (woocommerce_product_loop()) {
-                    echo '<div class="products-grid-container">';
-                    woocommerce_product_loop_start();
+                woocommerce_product_loop_start();
 
-                    while (have_posts()) {
-                        the_post();
-
+                if (wc_get_loop_prop('is_paginated')) {
+                    $total = wc_get_loop_prop('total');
+                    for ($i = 1; $i <= $total; $i++) {
                         /**
                          * Hook: woocommerce_shop_loop.
                          */
@@ -69,30 +56,25 @@ get_header('shop');
 
                         wc_get_template_part('content', 'product');
                     }
-
-                    woocommerce_product_loop_end();
-                    echo '</div>';
-
-                    /**
-                     * Hook: woocommerce_after_shop_loop.
-                     *
-                     * @hooked woocommerce_pagination - 10
-                     */
-                    do_action('woocommerce_after_shop_loop');
-                } else {
-                    echo '<div class="no-products-found">';
-                    echo '<div class="no-products-icon"><i class="fas fa-search"></i></div>';
-                    echo '<h3>No products found</h3>';
-                    echo '<p>Sorry, no products match your search criteria. Try adjusting your filters or search terms.</p>';
-                    echo '<a href="' . esc_url(wc_get_page_permalink('shop')) . '" class="btn btn-primary">View All Products</a>';
-                    echo '</div>';
                 }
+
+                woocommerce_product_loop_end();
+
+                /**
+                 * Hook: woocommerce_after_shop_loop.
+                 */
+                do_action('woocommerce_after_shop_loop');
                 ?>
-            </main>
+            </div>
         </div>
     </div>
 </div>
 
 <?php
+/**
+ * Hook: woocommerce_after_main_content.
+ */
+do_action('woocommerce_after_main_content');
+
 get_footer('shop');
 ?>
