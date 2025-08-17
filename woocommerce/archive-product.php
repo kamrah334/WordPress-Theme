@@ -44,21 +44,28 @@ do_action('woocommerce_before_main_content');
                  */
                 do_action('woocommerce_before_shop_loop');
 
-                woocommerce_product_loop_start();
+                if (woocommerce_product_loop()) {
+                    woocommerce_product_loop_start();
 
-                if (wc_get_loop_prop('is_paginated')) {
-                    $total = wc_get_loop_prop('total');
-                    for ($i = 1; $i <= $total; $i++) {
-                        /**
-                         * Hook: woocommerce_shop_loop.
-                         */
-                        do_action('woocommerce_shop_loop');
+                    if (wc_get_loop_prop('is_paginated')) {
+                        $total = wc_get_loop_prop('total');
+                        for ($i = 1; $i <= $total; $i++) {
+                            /**
+                             * Hook: woocommerce_shop_loop.
+                             */
+                            do_action('woocommerce_shop_loop');
 
-                        wc_get_template_part('content', 'product');
+                            wc_get_template_part('content', 'product');
+                        }
                     }
-                }
 
-                woocommerce_product_loop_end();
+                    woocommerce_product_loop_end();
+                } else {
+                    /**
+                     * Hook: woocommerce_no_products_found.
+                     */
+                    do_action('woocommerce_no_products_found');
+                }
 
                 /**
                  * Hook: woocommerce_after_shop_loop.

@@ -297,7 +297,7 @@ function shopora_customize_register($wp_customize) {
     ));
     
     $wp_customize->add_setting('shop_columns_desktop', array(
-        'default'           => 5,
+        'default'           => 4,
         'sanitize_callback' => 'absint',
     ));
     
@@ -544,9 +544,9 @@ function shopora_custom_styles() {
     $secondary_color = get_theme_mod('secondary_color', '#a855f7');
     $accent_color = get_theme_mod('accent_color', '#f59e0b');
     $header_font_size = get_theme_mod('header_font_size', 16);
-    $shop_columns_desktop = get_theme_mod('shop_columns_desktop', 5);
+    $shop_columns_desktop = get_theme_mod('shop_columns_desktop', 4);
     $shop_columns_desktop_no_sidebar = get_theme_mod('shop_columns_desktop_no_sidebar', 6);
-    $shop_columns_tablet = get_theme_mod('shop_columns_tablet', 4);
+    $shop_columns_tablet = get_theme_mod('shop_columns_tablet', 3);
     $shop_columns_mobile = get_theme_mod('shop_columns_mobile', 2);
     
     ?>
@@ -649,7 +649,7 @@ function shopora_woocommerce_init() {
     
     // Change products per page
     add_filter('loop_shop_per_page', function() {
-        return get_theme_mod('products_per_page', 15);
+        return get_theme_mod('products_per_page', 18);
     });
     
     // Remove default WooCommerce breadcrumbs
@@ -662,8 +662,36 @@ function shopora_woocommerce_init() {
     
     // Add custom shop toolbar
     add_action('woocommerce_before_shop_loop', 'shopora_shop_toolbar', 20);
+    
+    // Ensure proper product display
+    add_filter('woocommerce_output_related_products_args', 'shopora_related_products_args', 20);
+    add_filter('woocommerce_cross_sells_total', 'shopora_change_cross_sells_product_no');
+    add_filter('woocommerce_cross_sells_columns', 'shopora_change_cross_sells_columns');
 }
 add_action('init', 'shopora_woocommerce_init');
+
+/**
+ * Change related products args
+ */
+function shopora_related_products_args($args) {
+    $args['posts_per_page'] = 6;
+    $args['columns'] = 6;
+    return $args;
+}
+
+/**
+ * Change cross sells product number
+ */
+function shopora_change_cross_sells_product_no($columns) {
+    return 6;
+}
+
+/**
+ * Change cross sells columns
+ */
+function shopora_change_cross_sells_columns($columns) {
+    return 6;
+}
 
 /**
  * Custom shop toolbar

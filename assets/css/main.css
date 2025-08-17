@@ -1014,24 +1014,24 @@ a:hover {
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)) !important;
 }
 
-/* Default grid configurations */
+/* Default grid configurations - 6 column layout */
 .shop-layout.has-sidebar .woocommerce ul.products {
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)) !important;
+    grid-template-columns: repeat(4, 1fr) !important;
 }
 
 .shop-layout.no-sidebar .woocommerce ul.products {
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)) !important;
+    grid-template-columns: repeat(6, 1fr) !important;
 }
 
 /* Force grid layout */
 .woocommerce .products {
     display: grid !important;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)) !important;
-    gap: 25px !important;
+    grid-template-columns: repeat(6, 1fr) !important;
+    gap: 20px !important;
 }
 
 .shop-layout.has-sidebar .woocommerce .products {
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)) !important;
+    grid-template-columns: repeat(4, 1fr) !important;
 }
 
 /* Responsive Grid Breakpoints */
@@ -1043,7 +1043,7 @@ a:hover {
     
     .shop-layout.no-sidebar .woocommerce ul.products,
     .shop-layout.no-sidebar .woocommerce .products {
-        grid-template-columns: repeat(5, 1fr) !important;
+        grid-template-columns: repeat(6, 1fr) !important;
     }
 }
 
@@ -1091,7 +1091,7 @@ a:hover {
 .woocommerce .products li.product {
     background: var(--white) !important;
     border-radius: var(--border-radius-lg) !important;
-    padding: 20px !important;
+    padding: 15px !important;
     text-align: center !important;
     box-shadow: var(--shadow-md) !important;
     transition: all var(--transition-normal) !important;
@@ -1104,7 +1104,7 @@ a:hover {
     display: flex !important;
     flex-direction: column !important;
     justify-content: space-between !important;
-    min-height: 350px !important;
+    min-height: 380px !important;
     max-width: none !important;
 }
 
@@ -1132,10 +1132,10 @@ a:hover {
 
 .woocommerce ul.products li.product img {
     width: 100% !important;
-    height: 150px !important;
+    height: 180px !important;
     object-fit: cover !important;
     border-radius: var(--border-radius-sm) !important;
-    margin-bottom: 10px !important;
+    margin-bottom: 12px !important;
     transition: transform var(--transition-normal) !important;
 }
 
@@ -1144,10 +1144,10 @@ a:hover {
 }
 
 .woocommerce ul.products li.product .woocommerce-loop-product__title {
-    font-size: 0.95rem !important;
+    font-size: 0.9rem !important;
     font-weight: 600 !important;
     color: var(--text-dark) !important;
-    margin-bottom: 8px !important;
+    margin-bottom: 10px !important;
     line-height: 1.3 !important;
     height: 2.6em !important;
     overflow: hidden !important;
@@ -1159,8 +1159,8 @@ a:hover {
 .woocommerce ul.products li.product .price {
     color: var(--primary-color) !important;
     font-weight: 700 !important;
-    font-size: 1rem !important;
-    margin-bottom: 10px !important;
+    font-size: 1.1rem !important;
+    margin-bottom: 12px !important;
     display: block !important;
 }
 
@@ -1168,10 +1168,10 @@ a:hover {
     background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%) !important;
     color: var(--white) !important;
     border: none !important;
-    padding: 8px 12px !important;
+    padding: 10px 15px !important;
     border-radius: var(--border-radius-sm) !important;
     font-weight: 600 !important;
-    font-size: 0.8rem !important;
+    font-size: 0.85rem !important;
     transition: all var(--transition-normal) !important;
     text-transform: uppercase !important;
     letter-spacing: 0.3px !important;
@@ -1942,6 +1942,93 @@ a:hover {
     margin: -1px !important;
     overflow: hidden !important;
     clip: rect(0, 0, 0, 0) !important;
+
+
+/* Additional Product Card Enhancements */
+.woocommerce ul.products li.product-card-item {
+    position: relative !important;
+}
+
+.woocommerce ul.products li.product .product-card-inner {
+    height: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+}
+
+.woocommerce ul.products li.product .product-image-wrapper {
+    flex: 0 0 auto !important;
+    margin-bottom: 10px !important;
+}
+
+.woocommerce ul.products li.product .product-details {
+    flex: 1 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+}
+
+.woocommerce ul.products li.product .product-actions {
+    flex: 0 0 auto !important;
+    margin-top: auto !important;
+}
+
+/* Sale Badge */
+.woocommerce ul.products li.product .onsale {
+    position: absolute !important;
+    top: 10px !important;
+    right: 10px !important;
+    background: var(--error-color) !important;
+    color: var(--white) !important;
+    padding: 4px 8px !important;
+    border-radius: 12px !important;
+    font-size: 0.75rem !important;
+    font-weight: 600 !important;
+    z-index: 10 !important;
+}
+
+/* Product Link Styling */
+.woocommerce ul.products li.product a {
+    text-decoration: none !important;
+    color: inherit !important;
+}
+
+.woocommerce ul.products li.product a:hover {
+    color: inherit !important;
+}
+
+/* Ensure consistent spacing */
+.woocommerce ul.products li.product .woocommerce-loop-product__title a {
+    color: var(--text-dark) !important;
+    text-decoration: none !important;
+    transition: color var(--transition-normal) !important;
+}
+
+.woocommerce ul.products li.product .woocommerce-loop-product__title a:hover {
+    color: var(--primary-color) !important;
+}
+
+/* Price styling enhancements */
+.woocommerce ul.products li.product .price del {
+    color: var(--text-light) !important;
+    font-size: 0.9rem !important;
+}
+
+.woocommerce ul.products li.product .price ins {
+    text-decoration: none !important;
+    color: var(--primary-color) !important;
+}
+
+/* Loading state */
+.woocommerce ul.products li.product.loading {
+    opacity: 0.7 !important;
+}
+
+/* Product rating */
+.woocommerce ul.products li.product .star-rating {
+    margin: 5px auto 8px !important;
+    font-size: 0.8rem !important;
+}
+
     white-space: nowrap !important;
     border: 0 !important;
 }
