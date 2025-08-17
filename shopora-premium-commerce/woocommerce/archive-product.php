@@ -19,7 +19,7 @@ do_action('woocommerce_before_main_content');
 <div class="shop-container">
     <div class="container">
         <?php if (apply_filters('woocommerce_show_page_title', true)) : ?>
-            <div class="woocommerce-products-header">
+            <header class="woocommerce-products-header">
                 <h1 class="woocommerce-products-header__title page-title"><?php woocommerce_page_title(); ?></h1>
                 
                 <?php
@@ -28,18 +28,13 @@ do_action('woocommerce_before_main_content');
                  */
                 do_action('woocommerce_archive_description');
                 ?>
-            </div>
+            </header>
         <?php endif; ?>
 
         <div class="shop-layout <?php echo shopora_show_sidebar() ? 'has-sidebar' : 'no-sidebar'; ?>">
             <?php if (shopora_show_sidebar()) : ?>
                 <aside class="shop-sidebar">
-                    <?php
-                    /**
-                     * Hook: woocommerce_sidebar.
-                     */
-                    do_action('woocommerce_sidebar');
-                    ?>
+                    <?php get_sidebar(); ?>
                 </aside>
             <?php endif; ?>
 
