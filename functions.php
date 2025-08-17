@@ -231,8 +231,226 @@ function shopora_customize_register($wp_customize) {
         'section'  => 'shopora_contact',
         'type'     => 'textarea',
     ));
+    
+    // Button Links section
+    $wp_customize->add_section('shopora_buttons', array(
+        'title'    => __('Button Links & Text', 'shopora-premium-commerce'),
+        'priority' => 40,
+    ));
+    
+    // Hero Primary Button
+    $wp_customize->add_setting('hero_primary_btn_text', array(
+        'default'           => 'Shop Now',
+        'sanitize_callback' => 'sanitize_text_field',
+    ));
+    
+    $wp_customize->add_control('hero_primary_btn_text', array(
+        'label'    => __('Hero Primary Button Text', 'shopora-premium-commerce'),
+        'section'  => 'shopora_buttons',
+        'type'     => 'text',
+    ));
+    
+    $wp_customize->add_setting('hero_primary_btn_url', array(
+        'default'           => '/shop',
+        'sanitize_callback' => 'esc_url_raw',
+    ));
+    
+    $wp_customize->add_control('hero_primary_btn_url', array(
+        'label'    => __('Hero Primary Button URL', 'shopora-premium-commerce'),
+        'section'  => 'shopora_buttons',
+        'type'     => 'url',
+    ));
+    
+    // Hero Secondary Button
+    $wp_customize->add_setting('hero_secondary_btn_text', array(
+        'default'           => 'Learn More',
+        'sanitize_callback' => 'sanitize_text_field',
+    ));
+    
+    $wp_customize->add_control('hero_secondary_btn_text', array(
+        'label'    => __('Hero Secondary Button Text', 'shopora-premium-commerce'),
+        'section'  => 'shopora_buttons',
+        'type'     => 'text',
+    ));
+    
+    $wp_customize->add_setting('hero_secondary_btn_url', array(
+        'default'           => '/about',
+        'sanitize_callback' => 'esc_url_raw',
+    ));
+    
+    $wp_customize->add_control('hero_secondary_btn_url', array(
+        'label'    => __('Hero Secondary Button URL', 'shopora-premium-commerce'),
+        'section'  => 'shopora_buttons',
+        'type'     => 'url',
+    ));
+    
+    // View All Products Button
+    $wp_customize->add_setting('view_all_btn_text', array(
+        'default'           => 'View All Products',
+        'sanitize_callback' => 'sanitize_text_field',
+    ));
+    
+    $wp_customize->add_control('view_all_btn_text', array(
+        'label'    => __('View All Products Button Text', 'shopora-premium-commerce'),
+        'section'  => 'shopora_buttons',
+        'type'     => 'text',
+    ));
+    
+    $wp_customize->add_setting('view_all_btn_url', array(
+        'default'           => '/shop',
+        'sanitize_callback' => 'esc_url_raw',
+    ));
+    
+    $wp_customize->add_control('view_all_btn_url', array(
+        'label'    => __('View All Products Button URL', 'shopora-premium-commerce'),
+        'section'  => 'shopora_buttons',
+        'type'     => 'url',
+    ));
+    
+    // CTA Button
+    $wp_customize->add_setting('cta_btn_text', array(
+        'default'           => 'Get Started Today',
+        'sanitize_callback' => 'sanitize_text_field',
+    ));
+    
+    $wp_customize->add_control('cta_btn_text', array(
+        'label'    => __('CTA Button Text', 'shopora-premium-commerce'),
+        'section'  => 'shopora_buttons',
+        'type'     => 'text',
+    ));
+    
+    $wp_customize->add_setting('cta_btn_url', array(
+        'default'           => '/contact',
+        'sanitize_callback' => 'esc_url_raw',
+    ));
+    
+    $wp_customize->add_control('cta_btn_url', array(
+        'label'    => __('CTA Button URL', 'shopora-premium-commerce'),
+        'section'  => 'shopora_buttons',
+        'type'     => 'url',
+    ));
+    
+    // Button Styles section
+    $wp_customize->add_section('shopora_button_styles', array(
+        'title'    => __('Button Styles', 'shopora-premium-commerce'),
+        'priority' => 41,
+    ));
+    
+    // Primary Button Color
+    $wp_customize->add_setting('primary_btn_color', array(
+        'default'           => '#7c3aed',
+        'sanitize_callback' => 'sanitize_hex_color',
+    ));
+    
+    $wp_customize->add_control(new WP_Customize_Color_Control($wp_customize, 'primary_btn_color', array(
+        'label'    => __('Primary Button Color', 'shopora-premium-commerce'),
+        'section'  => 'shopora_button_styles',
+    )));
+    
+    // Primary Button Hover Color
+    $wp_customize->add_setting('primary_btn_hover_color', array(
+        'default'           => '#6d28d9',
+        'sanitize_callback' => 'sanitize_hex_color',
+    ));
+    
+    $wp_customize->add_control(new WP_Customize_Color_Control($wp_customize, 'primary_btn_hover_color', array(
+        'label'    => __('Primary Button Hover Color', 'shopora-premium-commerce'),
+        'section'  => 'shopora_button_styles',
+    )));
+    
+    // Secondary Button Border Color
+    $wp_customize->add_setting('secondary_btn_border_color', array(
+        'default'           => '#ffffff',
+        'sanitize_callback' => 'sanitize_hex_color',
+    ));
+    
+    $wp_customize->add_control(new WP_Customize_Color_Control($wp_customize, 'secondary_btn_border_color', array(
+        'label'    => __('Secondary Button Border Color', 'shopora-premium-commerce'),
+        'section'  => 'shopora_button_styles',
+    )));
+    
+    // Button Border Radius
+    $wp_customize->add_setting('btn_border_radius', array(
+        'default'           => '8',
+        'sanitize_callback' => 'absint',
+    ));
+    
+    $wp_customize->add_control('btn_border_radius', array(
+        'label'    => __('Button Border Radius (px)', 'shopora-premium-commerce'),
+        'section'  => 'shopora_button_styles',
+        'type'     => 'number',
+        'input_attrs' => array(
+            'min' => 0,
+            'max' => 50,
+        ),
+    ));
 }
 add_action('customize_register', 'shopora_customize_register');
+
+/**
+ * Output custom button styles
+ */
+function shopora_custom_button_styles() {
+    $primary_color = get_theme_mod('primary_btn_color', '#7c3aed');
+    $primary_hover_color = get_theme_mod('primary_btn_hover_color', '#6d28d9');
+    $secondary_border_color = get_theme_mod('secondary_btn_border_color', '#ffffff');
+    $border_radius = get_theme_mod('btn_border_radius', '8');
+    
+    ?>
+    <style type="text/css">
+        .btn-primary {
+            background: <?php echo esc_attr($primary_color); ?> !important;
+            border-radius: <?php echo esc_attr($border_radius); ?>px !important;
+        }
+        .btn-primary:hover {
+            background: <?php echo esc_attr($primary_hover_color); ?> !important;
+        }
+        .btn-secondary {
+            border-color: <?php echo esc_attr($secondary_border_color); ?> !important;
+            border-radius: <?php echo esc_attr($border_radius); ?>px !important;
+        }
+        .btn-secondary:hover {
+            background: <?php echo esc_attr($secondary_border_color); ?> !important;
+        }
+        .btn {
+            border-radius: <?php echo esc_attr($border_radius); ?>px !important;
+        }
+        .woocommerce ul.products li.product .button,
+        .woocommerce div.product form.cart .single_add_to_cart_button {
+            background: linear-gradient(135deg, <?php echo esc_attr($primary_color); ?> 0%, <?php echo esc_attr($primary_hover_color); ?> 100%) !important;
+            border-radius: <?php echo esc_attr($border_radius); ?>px !important;
+        }
+        .woocommerce ul.products li.product .button:hover,
+        .woocommerce div.product form.cart .single_add_to_cart_button:hover {
+            background: linear-gradient(135deg, <?php echo esc_attr($primary_hover_color); ?> 0%, <?php echo esc_attr($primary_color); ?> 100%) !important;
+        }
+    </style>
+    <?php
+}
+add_action('wp_head', 'shopora_custom_button_styles');
+
+/**
+ * Helper function to get button customizer settings
+ */
+function shopora_get_button_setting($setting_name, $default = '') {
+    return get_theme_mod($setting_name, $default);
+}
+
+/**
+ * Helper function to output customizable button
+ */
+function shopora_render_button($text_setting, $url_setting, $default_text, $default_url, $class = 'btn btn-primary', $additional_attrs = '') {
+    $text = shopora_get_button_setting($text_setting, $default_text);
+    $url = shopora_get_button_setting($url_setting, $default_url);
+    
+    printf(
+        '<a href="%s" class="%s" %s>%s</a>',
+        esc_url($url),
+        esc_attr($class),
+        $additional_attrs,
+        esc_html($text)
+    );
+}
 
 /**
  * WooCommerce modifications

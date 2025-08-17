@@ -9,7 +9,7 @@ get_header();
 ?>
 
 <main id="primary" class="site-main front-page">
-    
+
     <!-- Hero Section -->
     <section class="hero-section">
         <div class="container">
@@ -18,8 +18,12 @@ get_header();
                     <h1><?php echo esc_html(get_theme_mod('hero_title', 'Premium Products for Modern Living')); ?></h1>
                     <p><?php echo esc_html(get_theme_mod('hero_description', 'Discover our curated collection of high-quality products designed to enhance your lifestyle.')); ?></p>
                     <div class="hero-buttons">
-                        <a href="<?php echo esc_url(home_url('/shop/')); ?>" class="btn btn-primary">Shop Now</a>
-                        <a href="<?php echo esc_url(home_url('/about/')); ?>" class="btn btn-secondary">Learn More</a>
+                        <a href="<?php echo esc_url(get_theme_mod('hero_primary_btn_url', '/shop')); ?>" class="btn btn-primary">
+                            <?php echo esc_html(get_theme_mod('hero_primary_btn_text', 'Shop Now')); ?>
+                        </a>
+                        <a href="<?php echo esc_url(get_theme_mod('hero_secondary_btn_url', '/about')); ?>" class="btn btn-secondary">
+                            <?php echo esc_html(get_theme_mod('hero_secondary_btn_text', 'Learn More')); ?>
+                        </a>
                     </div>
                 </div>
                 <div class="hero-image">
@@ -36,7 +40,7 @@ get_header();
                 <h2>Featured Products</h2>
                 <p>Discover our most popular items chosen by customers worldwide</p>
             </div>
-            
+
             <div class="products-grid">
                 <?php if (class_exists('WooCommerce')) : ?>
                     <?php
@@ -55,9 +59,9 @@ get_header();
                             'meta_query' => WC()->query->get_meta_query(),
                         );
                     }
-                    
+
                     $products = new WP_Query($args);
-                    
+
                     if ($products->have_posts()) :
                         while ($products->have_posts()) : $products->the_post();
                             global $product;
@@ -93,7 +97,7 @@ get_header();
                         <div class="product-price">$299.00</div>
                         <a href="#" class="btn btn-primary">Shop Now</a>
                     </div>
-                    
+
                     <div class="product-card">
                         <div style="background: linear-gradient(45deg, #1f2937, #374151); height: 200px; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
                             <i class="fas fa-clock" style="font-size: 3rem; color: white;"></i>
@@ -103,7 +107,7 @@ get_header();
                         <div class="product-price">$199.00</div>
                         <a href="#" class="btn btn-primary">Shop Now</a>
                     </div>
-                    
+
                     <div class="product-card">
                         <div style="background: linear-gradient(45deg, #6b7280, #9ca3af); height: 200px; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
                             <i class="fas fa-laptop" style="font-size: 3rem; color: white;"></i>
@@ -114,6 +118,11 @@ get_header();
                         <a href="#" class="btn btn-primary">Shop Now</a>
                     </div>
                 <?php endif; ?>
+            </div>
+            <div style="text-align: center; margin-top: 40px;">
+                <a href="<?php echo esc_url(get_theme_mod('view_all_btn_url', '/shop')); ?>" class="btn btn-primary">
+                    <?php echo esc_html(get_theme_mod('view_all_btn_text', 'View All Products')); ?>
+                </a>
             </div>
         </div>
     </section>
@@ -148,7 +157,7 @@ get_header();
                 <h2>What Our Customers Say</h2>
                 <p>Don't just take our word for it - here's what some customers have to say about their experience with Premium Commerce</p>
             </div>
-            
+
             <div class="testimonials-grid">
                 <div class="testimonial-card">
                     <div class="stars">
@@ -167,7 +176,7 @@ get_header();
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="testimonial-card">
                     <div class="stars">
                         <i class="fas fa-star"></i>
@@ -185,7 +194,7 @@ get_header();
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="testimonial-card">
                     <div class="stars">
                         <i class="fas fa-star"></i>
@@ -214,7 +223,7 @@ get_header();
                 <div class="contact-info">
                     <h2>Get in Touch</h2>
                     <p>Have questions about our products or need help with your order? We're here to help!</p>
-                    
+
                     <div class="contact-details">
                         <div class="contact-item">
                             <i class="fas fa-phone"></i>
@@ -230,7 +239,7 @@ get_header();
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="contact-form">
                     <form action="#" method="post">
                         <div class="form-group">
@@ -252,6 +261,33 @@ get_header();
                         <button type="submit" class="btn btn-primary">Send Message</button>
                     </form>
                 </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta-section" style="background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%); padding: 80px 0; text-align: center; color: white;">
+        <div class="container">
+            <div class="cta-content">
+                <h2 style="font-size: 2.5rem; font-weight: 700; margin-bottom: 20px;">Ready to Transform Your Shopping Experience?</h2>
+                <p style="font-size: 1.2rem; margin-bottom: 30px; opacity: 0.9;">Join thousands of satisfied customers who trust our premium products.</p>
+                <a href="<?php echo esc_url(get_theme_mod('cta_btn_url', '/contact')); ?>" class="btn btn-secondary" style="background: white; color: #7c3aed; border: none; padding: 15px 35px; font-weight: 600;">
+                    <?php echo esc_html(get_theme_mod('cta_btn_text', 'Get Started Today')); ?>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Newsletter Section -->
+    <section class="newsletter-section">
+        <div class="container">
+            <div class="newsletter-content">
+                <h2>Stay Updated</h2>
+                <p>Subscribe to our newsletter for the latest products and exclusive offers.</p>
+                <form class="newsletter-form">
+                    <input type="email" placeholder="Enter your email address" required>
+                    <button type="submit" class="btn btn-primary">Subscribe</button>
+                </form>
             </div>
         </div>
     </section>
