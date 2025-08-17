@@ -557,27 +557,32 @@ function shopora_custom_styles() {
             --accent-color: <?php echo esc_attr($accent_color); ?>;
         }
         
-        .main-navigation {
+        .main-navigation,
+        .header-content .main-navigation ul li a {
             font-size: <?php echo esc_attr($header_font_size); ?>px;
         }
         
         /* Shop Grid Responsive */
-        .shop-layout.has-sidebar .woocommerce ul.products {
+        .shop-layout.has-sidebar .woocommerce ul.products,
+        .shop-layout.has-sidebar .woocommerce .products {
             grid-template-columns: repeat(<?php echo esc_attr($shop_columns_desktop); ?>, 1fr) !important;
         }
         
-        .shop-layout.no-sidebar .woocommerce ul.products {
+        .shop-layout.no-sidebar .woocommerce ul.products,
+        .shop-layout.no-sidebar .woocommerce .products {
             grid-template-columns: repeat(<?php echo esc_attr($shop_columns_desktop_no_sidebar); ?>, 1fr) !important;
         }
         
         @media (max-width: 1024px) {
-            .woocommerce ul.products {
+            .woocommerce ul.products,
+            .woocommerce .products {
                 grid-template-columns: repeat(<?php echo esc_attr($shop_columns_tablet); ?>, 1fr) !important;
             }
         }
         
         @media (max-width: 768px) {
-            .woocommerce ul.products {
+            .woocommerce ul.products,
+            .woocommerce .products {
                 grid-template-columns: repeat(<?php echo esc_attr($shop_columns_mobile); ?>, 1fr) !important;
             }
         }
@@ -585,32 +590,51 @@ function shopora_custom_styles() {
         /* Color Applications */
         .btn-primary,
         .woocommerce ul.products li.product .button,
-        .woocommerce div.product form.cart .single_add_to_cart_button {
+        .woocommerce div.product form.cart .single_add_to_cart_button,
+        button.single_add_to_cart_button.button.alt {
             background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%) !important;
+            color: var(--white) !important;
         }
         
         .btn-primary:hover,
         .woocommerce ul.products li.product .button:hover,
-        .woocommerce div.product form.cart .single_add_to_cart_button:hover {
+        .woocommerce div.product form.cart .single_add_to_cart_button:hover,
+        button.single_add_to_cart_button.button.alt:hover {
             background: linear-gradient(135deg, var(--secondary-color) 0%, var(--primary-color) 100%) !important;
         }
         
         .woocommerce ul.products li.product .price,
+        .woocommerce div.product .price,
         .price {
             color: var(--primary-color) !important;
+            font-weight: 700 !important;
         }
         
         .hero-section {
             background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
         }
         
-        .main-navigation a:hover {
-            color: var(--primary-color);
+        .main-navigation a:hover,
+        .header-content .main-navigation ul li a:hover {
+            color: var(--primary-color) !important;
+        }
+        
+        /* Sidebar styling */
+        .filter-section h4,
+        .widget-title {
+            color: var(--text-dark) !important;
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 10px;
+        }
+        
+        .filter-section ul li a:hover {
+            background: rgba(<?php echo implode(',', sscanf($primary_color, "#%02x%02x%02x")); ?>, 0.1) !important;
+            color: var(--primary-color) !important;
         }
     </style>
     <?php
 }
-add_action('wp_head', 'shopora_custom_styles');
+add_action('wp_head', 'shopora_custom_styles', 999);
 
 /**
  * Helper function to check if sidebar should be displayed
@@ -649,7 +673,7 @@ function shopora_woocommerce_init() {
     
     // Change products per page
     add_filter('loop_shop_per_page', function() {
-        return get_theme_mod('products_per_page', 18);
+        return get_theme_mod('products_per_page', 15);
     });
     
     // Remove default WooCommerce breadcrumbs
@@ -663,12 +687,26 @@ function shopora_woocommerce_init() {
     // Add custom shop toolbar
     add_action('woocommerce_before_shop_loop', 'shopora_shop_toolbar', 20);
     
+    // Fix loop columns
+    add_filter('loop_shop_columns', 'shopora_loop_columns');
+    
     // Ensure proper product display
     add_filter('woocommerce_output_related_products_args', 'shopora_related_products_args', 20);
     add_filter('woocommerce_cross_sells_total', 'shopora_change_cross_sells_product_no');
     add_filter('woocommerce_cross_sells_columns', 'shopora_change_cross_sells_columns');
 }
-add_action('init', 'shopora_woocommerce_init');
+add_action('after_setup_theme', 'shopora_woocommerce_init');
+
+/**
+ * Set loop columns based on sidebar
+ */
+function shopora_loop_columns() {
+    if (shopora_show_sidebar()) {
+        return get_theme_mod('shop_columns_desktop', 4);
+    } else {
+        return get_theme_mod('shop_columns_desktop_no_sidebar', 6);
+    }
+}
 
 /**
  * Change related products args
@@ -759,6 +797,104 @@ function shopora_register_widgets() {
     register_widget('Shopora_Product_Search_Widget');
 }
 add_action('widgets_init', 'shopora_register_widgets');
+
+/**
+ * Populate shop sidebar with default widgets if empty
+ */
+function shopora_populate_shop_sidebar() {
+    if (!is_active_sidebar('shop-sidebar')) {
+        // Add default widgets programmatically
+        $widget_options = array(
+            'title' => __('Search Products', 'shopora-premium-commerce')
+        );
+        
+        update_option('widget_shopora_product_search', array(
+            2 => $widget_options
+        ));
+        
+        $sidebars_widgets = get_option('sidebars_widgets');
+        if (!isset($sidebars_widgets['shop-sidebar'])) {
+            $sidebars_widgets['shop-sidebar'] = array();
+        }
+        
+        if (empty($sidebars_widgets['shop-sidebar'])) {
+            $sidebars_widgets['shop-sidebar'] = array(
+                'shopora_product_search-2'
+            );
+            update_option('sidebars_widgets', $sidebars_widgets);
+        }
+    }
+}
+add_action('wp_loaded', 'shopora_populate_shop_sidebar');
+
+/**
+ * Load WooCommerce compatibility file
+ */
+if (class_exists('WooCommerce')) {
+    add_action('after_setup_theme', 'shopora_woocommerce_setup');
+    
+    function shopora_woocommerce_setup() {
+        add_theme_support('woocommerce', array(
+            'thumbnail_image_width' => 300,
+            'single_image_width'    => 600,
+            'product_grid'          => array(
+                'default_rows'    => 3,
+                'min_rows'        => 2,
+                'max_rows'        => 8,
+                'default_columns' => 4,
+                'min_columns'     => 2,
+                'max_columns'     => 5,
+            ),
+        ));
+        
+        add_theme_support('wc-product-gallery-zoom');
+        add_theme_support('wc-product-gallery-lightbox');
+        add_theme_support('wc-product-gallery-slider');
+    }
+}
+
+/**
+ * Disable WooCommerce block styles
+ */
+function shopora_disable_woocommerce_block_styles() {
+    wp_dequeue_style('wc-blocks-style');
+    wp_dequeue_style('wc-blocks-style-active-filters');
+    wp_dequeue_style('wc-blocks-style-add-to-cart-form');
+    wp_dequeue_style('wc-blocks-style-all-products');
+    wp_dequeue_style('wc-blocks-style-all-reviews');
+    wp_dequeue_style('wc-blocks-style-attribute-filter');
+    wp_dequeue_style('wc-blocks-style-breadcrumbs');
+    wp_dequeue_style('wc-blocks-style-catalog-sorting');
+    wp_dequeue_style('wc-blocks-style-customer-account');
+    wp_dequeue_style('wc-blocks-style-featured-category');
+    wp_dequeue_style('wc-blocks-style-featured-product');
+    wp_dequeue_style('wc-blocks-style-mini-cart');
+    wp_dequeue_style('wc-blocks-style-price-filter');
+    wp_dequeue_style('wc-blocks-style-product-add-to-cart');
+    wp_dequeue_style('wc-blocks-style-product-button');
+    wp_dequeue_style('wc-blocks-style-product-categories');
+    wp_dequeue_style('wc-blocks-style-product-image');
+    wp_dequeue_style('wc-blocks-style-product-image-gallery');
+    wp_dequeue_style('wc-blocks-style-product-query');
+    wp_dequeue_style('wc-blocks-style-product-results-count');
+    wp_dequeue_style('wc-blocks-style-product-reviews');
+    wp_dequeue_style('wc-blocks-style-product-sale-badge');
+    wp_dequeue_style('wc-blocks-style-product-search');
+    wp_dequeue_style('wc-blocks-style-product-sku');
+    wp_dequeue_style('wc-blocks-style-product-stock-indicator');
+    wp_dequeue_style('wc-blocks-style-product-summary');
+    wp_dequeue_style('wc-blocks-style-product-title');
+    wp_dequeue_style('wc-blocks-style-rating-filter');
+    wp_dequeue_style('wc-blocks-style-reviews-by-category');
+    wp_dequeue_style('wc-blocks-style-reviews-by-product');
+    wp_dequeue_style('wc-blocks-style-product-details');
+    wp_dequeue_style('wc-blocks-style-single-product');
+    wp_dequeue_style('wc-blocks-style-stock-filter');
+    wp_dequeue_style('wc-blocks-style-cart');
+    wp_dequeue_style('wc-blocks-style-checkout');
+    wp_dequeue_style('wc-blocks-style-mini-cart-contents');
+}
+add_action('wp_enqueue_scripts', 'shopora_disable_woocommerce_block_styles', 100);
 
 /**
  * Include template tags

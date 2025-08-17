@@ -889,6 +889,14 @@ a:hover {
     flex-shrink: 0;
 }
 
+.shop-sidebar {
+    position: sticky;
+    top: 100px;
+    height: fit-content;
+    width: 280px;
+    flex-shrink: 0;
+}
+
 .sidebar-header {
     text-align: center;
     margin-bottom: 25px;
@@ -899,7 +907,7 @@ a:hover {
 }
 
 .sidebar-header h3 {
-    color: var(--white);
+    color: var(--white) !important;
     font-weight: 600;
     margin: 0;
     font-size: 1.2rem;
@@ -1004,34 +1012,26 @@ a:hover {
 }
 
 /* WooCommerce Product Grid */
-.woocommerce ul.products {
+.woocommerce ul.products,
+.woocommerce .products {
     display: grid !important;
-    gap: 25px !important;
+    gap: 20px !important;
     margin: 0 !important;
     padding: 0 !important;
     list-style: none !important;
     width: 100% !important;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)) !important;
-}
-
-/* Default grid configurations - 6 column layout */
-.shop-layout.has-sidebar .woocommerce ul.products {
-    grid-template-columns: repeat(4, 1fr) !important;
-}
-
-.shop-layout.no-sidebar .woocommerce ul.products {
     grid-template-columns: repeat(6, 1fr) !important;
 }
 
-/* Force grid layout */
-.woocommerce .products {
-    display: grid !important;
-    grid-template-columns: repeat(6, 1fr) !important;
-    gap: 20px !important;
-}
-
+/* Default grid configurations */
+.shop-layout.has-sidebar .woocommerce ul.products,
 .shop-layout.has-sidebar .woocommerce .products {
     grid-template-columns: repeat(4, 1fr) !important;
+}
+
+.shop-layout.no-sidebar .woocommerce ul.products,
+.shop-layout.no-sidebar .woocommerce .products {
+    grid-template-columns: repeat(6, 1fr) !important;
 }
 
 /* Responsive Grid Breakpoints */

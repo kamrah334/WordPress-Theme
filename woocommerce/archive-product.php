@@ -33,7 +33,7 @@ do_action('woocommerce_before_main_content');
         <div class="shop-layout <?php echo shopora_show_sidebar() ? 'has-sidebar' : 'no-sidebar'; ?>">
             <?php if (shopora_show_sidebar()) : ?>
                 <aside class="shop-sidebar">
-                    <?php dynamic_sidebar(shopora_get_sidebar_id()); ?>
+                    <?php get_sidebar(); ?>
                 </aside>
             <?php endif; ?>
 
@@ -45,6 +45,11 @@ do_action('woocommerce_before_main_content');
                 do_action('woocommerce_before_shop_loop');
 
                 if (woocommerce_product_loop()) {
+                    /**
+                     * Hook: woocommerce_before_shop_loop_start.
+                     */
+                    do_action('woocommerce_before_shop_loop_start');
+
                     woocommerce_product_loop_start();
 
                     if (wc_get_loop_prop('is_paginated')) {
@@ -60,17 +65,17 @@ do_action('woocommerce_before_main_content');
                     }
 
                     woocommerce_product_loop_end();
+
+                    /**
+                     * Hook: woocommerce_after_shop_loop.
+                     */
+                    do_action('woocommerce_after_shop_loop');
                 } else {
                     /**
                      * Hook: woocommerce_no_products_found.
                      */
                     do_action('woocommerce_no_products_found');
                 }
-
-                /**
-                 * Hook: woocommerce_after_shop_loop.
-                 */
-                do_action('woocommerce_after_shop_loop');
                 ?>
             </div>
         </div>

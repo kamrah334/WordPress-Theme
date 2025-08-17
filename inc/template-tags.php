@@ -1,3 +1,4 @@
+
 <?php
 /**
  * Custom template tags for this theme
@@ -5,10 +6,14 @@
  * @package Shopora_Premium_Commerce
  */
 
+if (!defined('ABSPATH')) {
+    exit;
+}
+
+/**
+ * Prints HTML with meta information for the current post-date/time.
+ */
 if (!function_exists('shopora_posted_on')) :
-    /**
-     * Prints HTML with meta information for the current post-date/time.
-     */
     function shopora_posted_on() {
         $time_string = '<time class="entry-date published updated" datetime="%1$s">%2$s</time>';
         if (get_the_time('U') !== get_the_modified_time('U')) {
@@ -23,32 +28,34 @@ if (!function_exists('shopora_posted_on')) :
         );
 
         $posted_on = sprintf(
+            /* translators: %s: post date. */
             esc_html_x('Posted on %s', 'post date', 'shopora-premium-commerce'),
             '<a href="' . esc_url(get_permalink()) . '" rel="bookmark">' . $time_string . '</a>'
         );
 
-        echo '<span class="posted-on">' . $posted_on . '</span>';
+        echo '<span class="posted-on">' . $posted_on . '</span>'; // WPCS: XSS OK.
     }
 endif;
 
+/**
+ * Prints HTML with meta information for the current author.
+ */
 if (!function_exists('shopora_posted_by')) :
-    /**
-     * Prints HTML with meta information for the current author.
-     */
     function shopora_posted_by() {
         $byline = sprintf(
+            /* translators: %s: post author. */
             esc_html_x('by %s', 'post author', 'shopora-premium-commerce'),
             '<span class="author vcard"><a class="url fn n" href="' . esc_url(get_author_posts_url(get_the_author_meta('ID'))) . '">' . esc_html(get_the_author()) . '</a></span>'
         );
 
-        echo '<span class="byline"> ' . $byline . '</span>';
+        echo '<span class="byline"> ' . $byline . '</span>'; // WPCS: XSS OK.
     }
 endif;
 
+/**
+ * Prints HTML with meta information for the categories, tags and comments.
+ */
 if (!function_exists('shopora_entry_footer')) :
-    /**
-     * Prints HTML with meta information for the categories, tags and comments.
-     */
     function shopora_entry_footer() {
         // Hide category and tag text for pages.
         if ('post' === get_post_type()) {
@@ -56,14 +63,14 @@ if (!function_exists('shopora_entry_footer')) :
             $categories_list = get_the_category_list(esc_html__(', ', 'shopora-premium-commerce'));
             if ($categories_list) {
                 /* translators: 1: list of categories. */
-                printf('<span class="cat-links">' . esc_html__('Posted in %1$s', 'shopora-premium-commerce') . '</span>', $categories_list);
+                printf('<span class="cat-links">' . esc_html__('Posted in %1$s', 'shopora-premium-commerce') . '</span>', $categories_list); // WPCS: XSS OK.
             }
 
             /* translators: used between list items, there is a space after the comma */
             $tags_list = get_the_tag_list('', esc_html_x(', ', 'list item separator', 'shopora-premium-commerce'));
             if ($tags_list) {
                 /* translators: 1: list of tags. */
-                printf('<span class="tags-links">' . esc_html__('Tagged %1$s', 'shopora-premium-commerce') . '</span>', $tags_list);
+                printf('<span class="tags-links">' . esc_html__('Tagged %1$s', 'shopora-premium-commerce') . '</span>', $tags_list); // WPCS: XSS OK.
             }
         }
 
@@ -72,6 +79,7 @@ if (!function_exists('shopora_entry_footer')) :
             comments_popup_link(
                 sprintf(
                     wp_kses(
+                        /* translators: %s: post title */
                         __('Leave a Comment<span class="screen-reader-text"> on %s</span>', 'shopora-premium-commerce'),
                         array(
                             'span' => array(
@@ -88,7 +96,8 @@ if (!function_exists('shopora_entry_footer')) :
         edit_post_link(
             sprintf(
                 wp_kses(
-                    __('Edit <span class="screen-reader-text">"%s"</span>', 'shopora-premium-commerce'),
+                    /* translators: %s: Name of current post. Only visible to screen readers */
+                    __('Edit <span class="screen-reader-text">%s</span>', 'shopora-premium-commerce'),
                     array(
                         'span' => array(
                             'class' => array(),
@@ -103,14 +112,14 @@ if (!function_exists('shopora_entry_footer')) :
     }
 endif;
 
-if (!function_exists('wp_body_open')) :
-    /**
-     * Shim for sites older than 5.2.
-     *
-     * @link https://core.trac.wordpress.org/ticket/12563
-     */
-    function wp_body_open() {
-        do_action('wp_body_open');
+/**
+ * Display a front page section.
+ *
+ * @param WP_Customize_Partial $partial Partial associated with a selective refresh request.
+ * @param integer              $id Front page section ID.
+ */
+function shopora_front_page_section($partial = null, $id = 0) {
+    if (is_customize_preview() && is_callable(array($partial, 'render_callback'))) {
+        $partial->render_callback();
     }
-endif;
-?>
+}

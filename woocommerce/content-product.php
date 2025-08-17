@@ -39,7 +39,7 @@ if (empty($product) || !$product->is_visible()) {
              * Hook: woocommerce_shop_loop_item_title.
              */
             do_action('woocommerce_shop_loop_item_title');
-
+            
             /**
              * Hook: woocommerce_after_shop_loop_item_title.
              */
