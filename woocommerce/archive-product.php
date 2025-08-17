@@ -1,3 +1,4 @@
+
 <?php
 /**
  * The Template for displaying product archives, including the main shop page which is a post type archive
@@ -33,7 +34,7 @@ do_action('woocommerce_before_main_content');
         <div class="shop-layout <?php echo shopora_show_sidebar() ? 'has-sidebar' : 'no-sidebar'; ?>">
             <?php if (shopora_show_sidebar()) : ?>
                 <aside class="shop-sidebar">
-                    <?php get_sidebar(); ?>
+                    <?php dynamic_sidebar('shop-sidebar'); ?>
                 </aside>
             <?php endif; ?>
 
@@ -87,6 +88,11 @@ do_action('woocommerce_before_main_content');
                      */
                     do_action('woocommerce_no_products_found');
                 }
+
+                /**
+                 * Hook: woocommerce_after_main_content.
+                 */
+                do_action('woocommerce_after_main_content');
                 ?>
             </div>
         </div>
@@ -94,10 +100,5 @@ do_action('woocommerce_before_main_content');
 </div>
 
 <?php
-/**
- * Hook: woocommerce_after_main_content.
- */
-do_action('woocommerce_after_main_content');
-
 get_footer('shop');
 ?>

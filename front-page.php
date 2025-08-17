@@ -78,9 +78,14 @@ get_header();
                     $featured_query = new WP_Query(array(
                         'post_type' => 'product',
                         'posts_per_page' => 6,
-                        'post__in' => $featured_products,
-                        'meta_query' => WC()->query->get_meta_query(),
-                        'tax_query' => WC()->query->get_tax_query(),
+                        'post__in' => !empty($featured_products) ? $featured_products : array(),
+                        'meta_query' => array(
+                            array(
+                                'key' => '_visibility',
+                                'value' => array('catalog', 'visible'),
+                                'compare' => 'IN'
+                            )
+                        )
                     ));
                     
                     if ($featured_query->have_posts()) :

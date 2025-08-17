@@ -757,7 +757,7 @@ if (class_exists('WooCommerce')) {
                 'default_rows'    => 3,
                 'min_rows'        => 2,
                 'max_rows'        => 8,
-                'default_columns' => 4,
+                'default_columns' => 6,
                 'min_columns'     => 2,
                 'max_columns'     => 6,
             ),
@@ -768,7 +768,7 @@ if (class_exists('WooCommerce')) {
 
         // Modify products per page
         add_filter('loop_shop_per_page', function() {
-            return get_theme_mod('products_per_page', 12);
+            return get_theme_mod('products_per_page', 18);
         });
 
         // Remove default actions and add custom ones
@@ -777,6 +777,9 @@ if (class_exists('WooCommerce')) {
 
         // Add custom shop toolbar
         add_action('woocommerce_before_shop_loop', 'shopora_shop_toolbar', 20);
+        
+        // Remove and replace related products
+        remove_action('woocommerce_output_related_products', 'woocommerce_output_related_products', 20);
     }
     add_action('after_setup_theme', 'shopora_woocommerce_setup');
 
