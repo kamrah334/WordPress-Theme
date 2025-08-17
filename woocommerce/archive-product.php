@@ -30,7 +30,13 @@ get_header('shop');
             ?>
         </header>
 
-        <div class="shop-content">
+        <div class="shop-layout <?php echo shopora_show_sidebar() ? 'has-sidebar' : 'no-sidebar'; ?>">
+            <?php if (shopora_show_sidebar()) : ?>
+                <div class="shop-sidebar">
+                    <?php get_sidebar(); ?>
+                </div>
+            <?php endif; ?>
+            
             <div class="shop-main">
                 <div class="shop-toolbar">
                     <?php
@@ -81,10 +87,6 @@ get_header('shop');
                 ?>
             </div>
         </div>
-
-        <?php if (shopora_show_sidebar()) : ?>
-            <?php get_sidebar(); ?>
-        <?php endif; ?>
     </div>
 </div>
 
