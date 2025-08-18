@@ -1,7 +1,7 @@
 
 <?php
 /**
- * The Template for displaying product archives, including the main shop page which is a post type archive
+ * The Template for displaying product archives, including the main shop page
  *
  * @package Shopora_Premium_Commerce
  */
@@ -9,11 +9,6 @@
 defined('ABSPATH') || exit;
 
 get_header('shop');
-
-/**
- * Hook: woocommerce_before_main_content.
- */
-do_action('woocommerce_before_main_content');
 ?>
 
 <div class="shop-container">
@@ -53,26 +48,30 @@ do_action('woocommerce_before_main_content');
 
                     woocommerce_product_loop_start();
 
-                    if (wc_get_loop_prop('is_paginated')) {
-                        $total = wc_get_loop_prop('total');
-                        for ($i = 1; $i <= $total; $i++) {
-                            /**
-                             * Hook: woocommerce_shop_loop.
-                             */
-                            do_action('woocommerce_shop_loop');
-
-                            wc_get_template_part('content', 'product');
+                    if (wc_get_loop_prop('is_shortcode')) {
+                        // Handle shortcode loop
+                        $shortcode_query = wc_get_loop_prop('shortcode_query');
+                        if ($shortcode_query->have_posts()) {
+                            while ($shortcode_query->have_posts()) {
+                                $shortcode_query->the_post();
+                                /**
+                                 * Hook: woocommerce_shop_loop.
+                                 */
+                                do_action('woocommerce_shop_loop');
+                                wc_get_template_part('content', 'product');
+                            }
                         }
                     } else {
-                        // Handle case when pagination is not set
-                        while (have_posts()) {
-                            the_post();
-                            /**
-                             * Hook: woocommerce_shop_loop.
-                             */
-                            do_action('woocommerce_shop_loop');
-
-                            wc_get_template_part('content', 'product');
+                        // Handle normal product archive
+                        if (have_posts()) {
+                            while (have_posts()) {
+                                the_post();
+                                /**
+                                 * Hook: woocommerce_shop_loop.
+                                 */
+                                do_action('woocommerce_shop_loop');
+                                wc_get_template_part('content', 'product');
+                            }
                         }
                     }
 
@@ -88,11 +87,6 @@ do_action('woocommerce_before_main_content');
                      */
                     do_action('woocommerce_no_products_found');
                 }
-
-                /**
-                 * Hook: woocommerce_after_main_content.
-                 */
-                do_action('woocommerce_after_main_content');
                 ?>
             </div>
         </div>
@@ -100,5 +94,10 @@ do_action('woocommerce_before_main_content');
 </div>
 
 <?php
+/**
+ * Hook: woocommerce_after_main_content.
+ */
+do_action('woocommerce_after_main_content');
+
 get_footer('shop');
 ?>

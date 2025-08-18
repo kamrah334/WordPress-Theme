@@ -1,3 +1,4 @@
+
 <?php
 /**
  * Shopora Premium Commerce Theme Functions
@@ -66,6 +67,47 @@ function shopora_setup() {
     add_image_size('shopora-product-grid', 300, 300, true);
 }
 add_action('after_setup_theme', 'shopora_setup');
+
+/**
+ * Fallback menu for primary navigation
+ */
+function shopora_fallback_menu() {
+    ?>
+    <ul class="main-menu">
+        <li><a href="<?php echo esc_url(home_url('/')); ?>"><?php esc_html_e('Home', 'shopora-premium-commerce'); ?></a></li>
+        <?php if (class_exists('WooCommerce')) : ?>
+            <li><a href="<?php echo esc_url(wc_get_page_permalink('shop')); ?>"><?php esc_html_e('Shop', 'shopora-premium-commerce'); ?></a></li>
+        <?php endif; ?>
+        <li><a href="<?php echo esc_url(get_permalink(get_option('page_for_posts'))); ?>"><?php esc_html_e('Blog', 'shopora-premium-commerce'); ?></a></li>
+        <?php
+        // Add pages to menu
+        $pages = get_pages(array('meta_key' => '_wp_page_template', 'meta_value' => 'page.php', 'number' => 3));
+        foreach ($pages as $page) {
+            echo '<li><a href="' . esc_url(get_permalink($page->ID)) . '">' . esc_html($page->post_title) . '</a></li>';
+        }
+        ?>
+    </ul>
+    <?php
+}
+
+/**
+ * Posts pagination
+ */
+function shopora_posts_pagination() {
+    $pagination = paginate_links(array(
+        'type' => 'array',
+        'prev_text' => '<i class="fas fa-chevron-left"></i>',
+        'next_text' => '<i class="fas fa-chevron-right"></i>',
+    ));
+
+    if ($pagination) {
+        echo '<nav class="posts-pagination"><ul class="page-numbers">';
+        foreach ($pagination as $page) {
+            echo '<li>' . $page . '</li>';
+        }
+        echo '</ul></nav>';
+    }
+}
 
 /**
  * Enqueue scripts and styles
