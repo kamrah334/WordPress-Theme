@@ -1,20 +1,25 @@
-
 /**
  * Shopora Premium Commerce Theme JavaScript
+ *
+ * @package Shopora_Premium_Commerce
  */
 
-(function($) {
+// Wait for jQuery to be available
+function initShopora() {
     'use strict';
 
+    // Use $ safely within this scope
+    const $ = jQuery;
+
     $(document).ready(function() {
-        
+
         // Initialize theme functionality
         initMobileMenu();
         initSearchToggle();
         initSmoothScroll();
         initScrollAnimations();
         initHeaderScroll();
-        
+
         // WooCommerce specific
         if (typeof wc_add_to_cart_params !== 'undefined') {
             initWooCommerce();
@@ -48,7 +53,7 @@
             e.preventDefault();
             const $searchForm = $('#search-form');
             $searchForm.toggleClass('hidden');
-            
+
             if (!$searchForm.hasClass('hidden')) {
                 $searchForm.find('input[type="search"]').focus();
             }
@@ -68,7 +73,7 @@
     function initSmoothScroll() {
         $('a[href^="#"]').on('click', function(e) {
             const target = $(this.getAttribute('href'));
-            
+
             if (target.length) {
                 e.preventDefault();
                 $('html, body').animate({
@@ -109,7 +114,7 @@
 
         $(window).on('scroll', function() {
             const scrollTop = $(this).scrollTop();
-            
+
             if (scrollTop > 100) {
                 $header.addClass('scrolled');
             } else {
@@ -131,7 +136,7 @@
 
         $(document.body).on('added_to_cart', function(event, fragments, cart_hash, $button) {
             $button.removeClass('loading');
-            
+
             // Update cart count in header
             if (fragments && fragments['div.widget_shopping_cart_content']) {
                 updateCartCount();
@@ -184,7 +189,7 @@
             success: function(response) {
                 if (response.success) {
                     $('.cart-count').text(response.data.count);
-                    
+
                     if (response.data.count > 0) {
                         $('.cart-count').removeClass('hidden');
                     } else {
@@ -288,7 +293,45 @@
     initFormValidation();
     initLazyLoading();
 
-})(jQuery);
+}
+
+// Initialize when jQuery is available
+if (typeof jQuery !== 'undefined') {
+    initShopora();
+} else {
+    // Wait for jQuery to load
+    document.addEventListener('DOMContentLoaded', function() {
+        if (typeof jQuery !== 'undefined') {
+            initShopora();
+        } else {
+            // Fallback for basic functionality without jQuery
+            initBasicFeatures();
+        }
+    });
+}
+
+// Basic features that don't require jQuery
+function initBasicFeatures() {
+    // Mobile menu toggle
+    const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
+    const mobileMenu = document.getElementById('mobile-menu');
+
+    if (mobileMenuToggle && mobileMenu) {
+        mobileMenuToggle.addEventListener('click', function() {
+            mobileMenu.classList.toggle('hidden');
+        });
+    }
+
+    // Search toggle
+    const searchToggle = document.getElementById('search-toggle');
+    const searchForm = document.getElementById('search-form');
+
+    if (searchToggle && searchForm) {
+        searchToggle.addEventListener('click', function() {
+            searchForm.classList.toggle('hidden');
+        });
+    }
+}
 
 /**
  * AJAX Cart Count Update (WordPress AJAX Handler)
