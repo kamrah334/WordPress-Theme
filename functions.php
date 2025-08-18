@@ -1,4 +1,3 @@
-
 <?php
 /**
  * Shopora Premium Commerce Theme Functions
@@ -248,29 +247,44 @@ add_filter('excerpt_more', 'shopora_excerpt_more');
  * Add custom body classes
  */
 function shopora_body_classes($classes) {
-    if (!is_singular()) {
-        $classes[] = 'hfeed';
-    }
-
-    if (is_front_page()) {
-        $classes[] = 'front-page';
-    }
-
-    // Add sidebar class
     if (shopora_show_sidebar()) {
         $classes[] = 'has-sidebar';
     } else {
         $classes[] = 'no-sidebar';
     }
 
-    // Add mobile class
-    if (wp_is_mobile()) {
-        $classes[] = 'is-mobile';
-    }
-
     return $classes;
 }
 add_filter('body_class', 'shopora_body_classes');
+
+/**
+ * AJAX Cart Count Update
+ */
+function shopora_get_cart_count() {
+    check_ajax_referer('shopora_nonce', 'nonce');
+
+    $count = 0;
+    if (class_exists('WooCommerce')) {
+        $count = WC()->cart->get_cart_contents_count();
+    }
+
+    wp_send_json_success(array('count' => $count));
+}
+add_action('wp_ajax_get_cart_count', 'shopora_get_cart_count');
+add_action('wp_ajax_nopriv_get_cart_count', 'shopora_get_cart_count');
+
+/**
+ * Fallback menu function
+ */
+function shopora_fallback_menu() {
+    echo '<ul class="flex items-center space-x-8">';
+    echo '<li><a href="' . esc_url(home_url('/')) . '" class="text-gray-700 hover:text-purple-600 font-medium transition-colors">' . esc_html__('Home', 'shopora-premium-commerce') . '</a></li>';
+    if (class_exists('WooCommerce')) {
+        echo '<li><a href="' . esc_url(wc_get_page_permalink('shop')) . '" class="text-gray-700 hover:text-purple-600 font-medium transition-colors">' . esc_html__('Shop', 'shopora-premium-commerce') . '</a></li>';
+    }
+    echo '<li><a href="' . esc_url(get_permalink(get_option('page_for_posts'))) . '" class="text-gray-700 hover:text-purple-600 font-medium transition-colors">' . esc_html__('Blog', 'shopora-premium-commerce') . '</a></li>';
+    echo '</ul>';
+}
 
 /**
  * Customizer settings
@@ -823,7 +837,7 @@ if (class_exists('WooCommerce')) {
 
         // Add custom shop toolbar
         add_action('woocommerce_before_shop_loop', 'shopora_shop_toolbar', 20);
-        
+
         // Remove and replace related products
         remove_action('woocommerce_output_related_products', 'woocommerce_output_related_products', 20);
     }
