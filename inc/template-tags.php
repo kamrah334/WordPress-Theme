@@ -1,121 +1,13 @@
-
 <?php
 /**
  * Custom template tags for this theme
  *
- * Eventually, some of the functionality here could be replaced by core features.
- *
  * @package Shopora_Premium_Commerce
  */
-
-if (!function_exists('shopora_posted_on')):
-/**
- * Prints HTML with meta information for the current post-date/time.
- */
-function shopora_posted_on() {
-    $time_string = '<time class="entry-date published updated" datetime="%1$s">%2$s</time>';
-    if (get_the_time('U') !== get_the_modified_time('U')) {
-        $time_string = '<time class="entry-date published" datetime="%1$s">%2$s</time><time class="updated" datetime="%3$s">%4$s</time>';
-    }
-
-    $time_string = sprintf($time_string,
-        esc_attr(get_the_date(DATE_W3C)),
-        esc_html(get_the_date()),
-        esc_attr(get_the_modified_date(DATE_W3C)),
-        esc_html(get_the_modified_date())
-    );
-
-    $posted_on = sprintf(
-        /* translators: %s: post date. */
-        esc_html_x('Posted on %s', 'post date', 'shopora-premium-commerce'),
-        '<a href="' . esc_url(get_permalink()) . '" rel="bookmark">' . $time_string . '</a>'
-    );
-
-    echo '<span class="posted-on">' . $posted_on . '</span>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-}
-endif;
-
-if (!function_exists('shopora_posted_by')):
-/**
- * Prints HTML with meta information for the current author.
- */
-function shopora_posted_by() {
-    $byline = sprintf(
-        /* translators: %s: post author. */
-        esc_html_x('by %s', 'post author', 'shopora-premium-commerce'),
-        '<span class="author vcard"><a class="url fn n" href="' . esc_url(get_author_posts_url(get_the_author_meta('ID'))) . '">' . esc_html(get_the_author()) . '</a></span>'
-    );
-
-    echo '<span class="byline"> ' . $byline . '</span>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-}
-endif;
-
-if (!function_exists('shopora_entry_footer')):
-/**
- * Prints HTML with meta information for the categories, tags and comments.
- */
-function shopora_entry_footer() {
-    // Hide category and tag text for pages.
-    if ('post' === get_post_type()) {
-        /* translators: used between list items, there is a space after the comma */
-        $categories_list = get_the_category_list(esc_html__(', ', 'shopora-premium-commerce'));
-        if ($categories_list) {
-            /* translators: 1: list of categories. */
-            printf('<span class="cat-links">' . esc_html__('Posted in %1$s', 'shopora-premium-commerce') . '</span>', $categories_list); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-        }
-
-        /* translators: used between list items, there is a space after the comma */
-        $tags_list = get_the_tag_list('', esc_html_x(', ', 'list item separator', 'shopora-premium-commerce'));
-        if ($tags_list) {
-            /* translators: 1: list of tags. */
-            printf('<span class="tags-links">' . esc_html__('Tagged %1$s', 'shopora-premium-commerce') . '</span>', $tags_list); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-        }
-    }
-
-    if (!is_single() && !post_password_required() && (comments_open() || get_comments_number())) {
-        echo '<span class="comments-link">';
-        comments_popup_link(
-            sprintf(
-                wp_kses(
-                    /* translators: %s: post title */
-                    __('Leave a Comment<span class="screen-reader-text"> on %s</span>', 'shopora-premium-commerce'),
-                    array(
-                        'span' => array(
-                            'class' => array(),
-                        ),
-                    )
-                ),
-                wp_kses_post(get_the_title())
-            )
-        );
-        echo '</span>';
-    }
-
-    edit_post_link(
-        sprintf(
-            wp_kses(
-                /* translators: %s: Name of current post. Only visible to screen readers */
-                __('Edit <span class="screen-reader-text">%s</span>', 'shopora-premium-commerce'),
-                array(
-                    'span' => array(
-                        'class' => array(),
-                    ),
-                )
-            ),
-            wp_kses_post(get_the_title())
-        ),
-        '<span class="edit-link">',
-        '</span>'
-    );
-}
-endif;
 
 if (!function_exists('shopora_post_thumbnail')):
 /**
  * Displays an optional post thumbnail.
- *
- * Wraps the post thumbnail in an anchor element on index views, or a div
- * element when on single views.
  */
 function shopora_post_thumbnail() {
     if (post_password_required() || is_attachment() || !has_post_thumbnail()) {
@@ -124,7 +16,7 @@ function shopora_post_thumbnail() {
 
     if (is_singular()):
         ?>
-        <div class="post-thumbnail">
+        <div class="post-thumbnail fade-in">
             <?php the_post_thumbnail('shopora-featured', array('class' => 'featured-image')); ?>
         </div><!-- .post-thumbnail -->
     <?php else: ?>
@@ -174,21 +66,21 @@ function shopora_get_social_links() {
             'label' => __('Pinterest', 'shopora-premium-commerce')
         ),
     );
-    
-    $links = array();
-    
+
+    $social_links = array();
+
     foreach ($social_networks as $network => $data) {
         $url = get_theme_mod("social_{$network}");
         if ($url) {
-            $links[$network] = array(
+            $social_links[$network] = array(
                 'url' => esc_url($url),
                 'icon' => $data['icon'],
                 'label' => $data['label']
             );
         }
     }
-    
-    return $links;
+
+    return $social_links;
 }
 endif;
 
@@ -196,63 +88,128 @@ if (!function_exists('shopora_display_social_links')):
 /**
  * Display social media links
  */
-function shopora_display_social_links($class = 'social-links') {
+function shopora_display_social_links() {
     $social_links = shopora_get_social_links();
-    
+
     if (empty($social_links)) {
         return;
     }
-    
-    echo '<div class="' . esc_attr($class) . '">';
-    
+
+    echo '<div class="social-links">';
     foreach ($social_links as $network => $data) {
         printf(
-            '<a href="%s" target="_blank" rel="noopener noreferrer" aria-label="%s" class="social-link social-link-%s">
+            '<a href="%s" target="_blank" rel="noopener noreferrer" class="social-link social-link-%s" aria-label="%s">
                 <i class="%s" aria-hidden="true"></i>
             </a>',
             $data['url'],
-            $data['label'],
             esc_attr($network),
+            esc_attr($data['label']),
             esc_attr($data['icon'])
         );
     }
-    
     echo '</div>';
 }
 endif;
 
-if (!function_exists('shopora_get_reading_time')):
+if (!function_exists('shopora_posted_on')):
 /**
- * Calculate estimated reading time for a post
+ * Prints HTML with meta information for the current post-date/time.
  */
-function shopora_get_reading_time($post_id = null) {
-    if (!$post_id) {
-        $post_id = get_the_ID();
+function shopora_posted_on() {
+    $time_string = '<time class="entry-date published updated" datetime="%1$s">%2$s</time>';
+    if (get_the_time('U') !== get_the_modified_time('U')) {
+        $time_string = '<time class="entry-date published" datetime="%1$s">%2$s</time><time class="updated" datetime="%3$s">%4$s</time>';
     }
-    
-    $content = get_post_field('post_content', $post_id);
-    $word_count = str_word_count(strip_tags($content));
-    $reading_time = ceil($word_count / 200); // Average reading speed of 200 words per minute
-    
-    return $reading_time;
+
+    $time_string = sprintf($time_string,
+        esc_attr(get_the_date(DATE_W3C)),
+        esc_html(get_the_date()),
+        esc_attr(get_the_modified_date(DATE_W3C)),
+        esc_html(get_the_modified_date())
+    );
+
+    $posted_on = sprintf(
+        /* translators: %s: post date. */
+        esc_html_x('Posted on %s', 'post date', 'shopora-premium-commerce'),
+        '<a href="' . esc_url(get_permalink()) . '" rel="bookmark">' . $time_string . '</a>'
+    );
+
+    echo '<span class="posted-on">' . $posted_on . '</span>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 }
 endif;
 
-if (!function_exists('shopora_display_reading_time')):
+if (!function_exists('shopora_posted_by')):
 /**
- * Display estimated reading time
+ * Prints HTML with meta information for the current author.
  */
-function shopora_display_reading_time($post_id = null) {
-    $reading_time = shopora_get_reading_time($post_id);
-    
-    printf(
-        '<span class="reading-time">
-            <i class="fas fa-clock" aria-hidden="true"></i>
-            %s %s
-        </span>',
-        $reading_time,
-        _n('min read', 'mins read', $reading_time, 'shopora-premium-commerce')
+function shopora_posted_by() {
+    $byline = sprintf(
+        /* translators: %s: post author. */
+        esc_html_x('by %s', 'post author', 'shopora-premium-commerce'),
+        '<span class="author vcard"><a class="url fn n" href="' . esc_url(get_author_posts_url(get_the_author_meta('ID'))) . '">' . esc_html(get_the_author()) . '</a></span>'
     );
+
+    echo '<span class="byline"> ' . $byline . '</span>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+}
+endif;
+
+if (!function_exists('shopora_entry_categories')):
+/**
+ * Prints HTML with category information for the current post.
+ */
+function shopora_entry_categories() {
+    if ('post' === get_post_type()) {
+        $categories_list = get_the_category_list(esc_html__(', ', 'shopora-premium-commerce'));
+        if ($categories_list) {
+            printf(
+                '<span class="cat-links">%1$s</span>',
+                $categories_list // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+            );
+        }
+    }
+}
+endif;
+
+if (!function_exists('shopora_entry_tags')):
+/**
+ * Prints HTML with tag information for the current post.
+ */
+function shopora_entry_tags() {
+    if ('post' === get_post_type()) {
+        $tags_list = get_the_tag_list('', esc_html_x(', ', 'list item separator', 'shopora-premium-commerce'));
+        if ($tags_list) {
+            printf(
+                '<span class="tags-links">%1$s %2$s</span>',
+                esc_html__('Tagged:', 'shopora-premium-commerce'),
+                $tags_list // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+            );
+        }
+    }
+}
+endif;
+
+if (!function_exists('shopora_post_meta')):
+/**
+ * Display post meta information
+ */
+function shopora_post_meta() {
+    echo '<div class="blog-meta">';
+    echo '<i class="fas fa-calendar-alt"></i>';
+    shopora_posted_on();
+    echo '<i class="fas fa-user"></i>';
+    shopora_posted_by();
+
+    if (get_comments_number() > 0) {
+        echo '<i class="fas fa-comments"></i>';
+        echo '<a href="' . esc_url(get_comments_link()) . '">';
+        printf(
+            /* translators: %s: comment count */
+            esc_html(_n('%s Comment', '%s Comments', get_comments_number(), 'shopora-premium-commerce')),
+            number_format_i18n(get_comments_number())
+        );
+        echo '</a>';
+    }
+    echo '</div>';
 }
 endif;
 
@@ -264,236 +221,177 @@ function shopora_breadcrumbs() {
     if (is_front_page()) {
         return;
     }
-    
-    $breadcrumbs = array();
-    
-    // Home link
-    $breadcrumbs[] = array(
-        'title' => __('Home', 'shopora-premium-commerce'),
-        'url' => home_url('/')
-    );
-    
-    if (is_category() || is_single()) {
-        $category = get_the_category();
-        if ($category) {
-            $breadcrumbs[] = array(
-                'title' => $category[0]->name,
-                'url' => get_category_link($category[0]->term_id)
-            );
-        }
-    }
-    
-    if (is_single()) {
-        $breadcrumbs[] = array(
-            'title' => get_the_title(),
-            'url' => ''
-        );
-    } elseif (is_page()) {
-        $breadcrumbs[] = array(
-            'title' => get_the_title(),
-            'url' => ''
-        );
-    } elseif (is_archive()) {
-        $breadcrumbs[] = array(
-            'title' => get_the_archive_title(),
-            'url' => ''
-        );
-    } elseif (is_search()) {
-        $breadcrumbs[] = array(
-            'title' => sprintf(__('Search Results for: %s', 'shopora-premium-commerce'), get_search_query()),
-            'url' => ''
-        );
-    }
-    
-    if (empty($breadcrumbs)) {
-        return;
-    }
-    
-    echo '<nav class="breadcrumbs" aria-label="' . esc_attr__('Breadcrumb', 'shopora-premium-commerce') . '">';
-    echo '<ol class="breadcrumb-list">';
-    
-    foreach ($breadcrumbs as $index => $breadcrumb) {
-        $is_last = ($index === count($breadcrumbs) - 1);
-        
-        echo '<li class="breadcrumb-item' . ($is_last ? ' active' : '') . '">';
-        
-        if (!$is_last && !empty($breadcrumb['url'])) {
-            printf('<a href="%s">%s</a>', esc_url($breadcrumb['url']), esc_html($breadcrumb['title']));
-        } else {
-            echo esc_html($breadcrumb['title']);
-        }
-        
-        echo '</li>';
-        
-        if (!$is_last) {
-            echo '<li class="breadcrumb-separator" aria-hidden="true">/</li>';
-        }
-    }
-    
-    echo '</ol>';
-    echo '</nav>';
-}
-endif;
 
-if (!function_exists('shopora_get_featured_posts')):
-/**
- * Get featured posts
- */
-function shopora_get_featured_posts($limit = 3) {
-    $args = array(
-        'post_type' => 'post',
-        'posts_per_page' => $limit,
-        'meta_query' => array(
-            array(
-                'key' => '_shopora_featured_post',
-                'value' => 'yes',
-                'compare' => '='
-            )
-        )
-    );
-    
-    return new WP_Query($args);
+    $delimiter = '<i class="fas fa-chevron-right"></i>';
+    $home_title = __('Home', 'shopora-premium-commerce');
+
+    echo '<nav class="breadcrumbs" aria-label="' . esc_attr__('Breadcrumb Navigation', 'shopora-premium-commerce') . '">';
+    echo '<div class="container">';
+    echo '<a href="' . esc_url(home_url('/')) . '">' . esc_html($home_title) . '</a>';
+
+    if (is_category() || is_single()) {
+        echo ' ' . $delimiter . ' ';
+        the_category(' ' . $delimiter . ' ');
+        if (is_single()) {
+            echo ' ' . $delimiter . ' ';
+            the_title();
+        }
+    } elseif (is_page()) {
+        echo ' ' . $delimiter . ' ';
+        the_title();
+    } elseif (is_search()) {
+        echo ' ' . $delimiter . ' ';
+        printf(__('Search Results for "%s"', 'shopora-premium-commerce'), get_search_query());
+    } elseif (is_tag()) {
+        echo ' ' . $delimiter . ' ';
+        printf(__('Posts Tagged "%s"', 'shopora-premium-commerce'), single_tag_title('', false));
+    } elseif (is_author()) {
+        echo ' ' . $delimiter . ' ';
+        printf(__('Author: %s', 'shopora-premium-commerce'), get_the_author());
+    } elseif (is_404()) {
+        echo ' ' . $delimiter . ' ';
+        _e('Error 404', 'shopora-premium-commerce');
+    }
+
+    echo '</div>';
+    echo '</nav>';
 }
 endif;
 
 if (!function_exists('shopora_pagination')):
 /**
- * Display numeric pagination
+ * Display pagination
  */
 function shopora_pagination() {
+    if (is_singular()) {
+        return;
+    }
+
     global $wp_query;
-    
-    $total_pages = $wp_query->max_num_pages;
-    
-    if ($total_pages > 1) {
-        $current_page = max(1, get_query_var('paged'));
-        
-        echo '<nav class="pagination-nav" aria-label="' . esc_attr__('Posts navigation', 'shopora-premium-commerce') . '">';
-        
-        echo paginate_links(array(
-            'base' => get_pagenum_link(1) . '%_%',
-            'format' => 'page/%#%/',
-            'current' => $current_page,
-            'total' => $total_pages,
-            'prev_text' => '<i class="fas fa-chevron-left"></i> ' . __('Previous', 'shopora-premium-commerce'),
-            'next_text' => __('Next', 'shopora-premium-commerce') . ' <i class="fas fa-chevron-right"></i>',
-            'type' => 'list',
-            'end_size' => 2,
-            'mid_size' => 1,
-        ));
-        
+
+    if ($wp_query->max_num_pages <= 1) {
+        return;
+    }
+
+    $pagination = paginate_links(array(
+        'base' => str_replace(999999999, '%#%', esc_url(get_pagenum_link(999999999))),
+        'total' => $wp_query->max_num_pages,
+        'current' => max(1, get_query_var('paged')),
+        'format' => '?paged=%#%',
+        'show_all' => false,
+        'type' => 'list',
+        'end_size' => 2,
+        'mid_size' => 1,
+        'prev_next' => true,
+        'prev_text' => sprintf('<i class="fas fa-chevron-left"></i> %s', __('Previous', 'shopora-premium-commerce')),
+        'next_text' => sprintf('%s <i class="fas fa-chevron-right"></i>', __('Next', 'shopora-premium-commerce')),
+        'add_args' => false,
+        'add_fragment' => '',
+    ));
+
+    if ($pagination) {
+        echo '<nav class="pagination-container" aria-label="' . esc_attr__('Posts Navigation', 'shopora-premium-commerce') . '">';
+        echo $pagination; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
         echo '</nav>';
     }
 }
 endif;
 
-if (!function_exists('shopora_get_related_posts')):
+if (!function_exists('shopora_get_reading_time')):
 /**
- * Get related posts based on categories
+ * Calculate reading time for a post
  */
-function shopora_get_related_posts($post_id = null, $limit = 3) {
+function shopora_get_reading_time($post_id = null) {
     if (!$post_id) {
         $post_id = get_the_ID();
     }
-    
-    $categories = wp_get_post_categories($post_id);
-    
-    if (empty($categories)) {
-        return new WP_Query();
-    }
-    
-    $args = array(
-        'post_type' => 'post',
-        'posts_per_page' => $limit,
-        'post__not_in' => array($post_id),
-        'category__in' => $categories,
-        'orderby' => 'rand'
+
+    $content = get_post_field('post_content', $post_id);
+    $word_count = str_word_count(strip_tags($content));
+    $reading_time = ceil($word_count / 200); // Average reading speed is 200 words per minute
+
+    return $reading_time;
+}
+endif;
+
+if (!function_exists('shopora_display_reading_time')):
+/**
+ * Display reading time
+ */
+function shopora_display_reading_time($post_id = null) {
+    $reading_time = shopora_get_reading_time($post_id);
+
+    printf(
+        '<span class="reading-time"><i class="fas fa-clock"></i> %s</span>',
+        sprintf(
+            /* translators: %d: reading time in minutes */
+            _n('%d min read', '%d min read', $reading_time, 'shopora-premium-commerce'),
+            $reading_time
+        )
     );
-    
-    return new WP_Query($args);
 }
 endif;
 
-if (!function_exists('shopora_get_post_views')):
+if (!function_exists('shopora_custom_logo')):
 /**
- * Get post view count
+ * Display custom logo with fallback
  */
-function shopora_get_post_views($post_id = null) {
-    if (!$post_id) {
-        $post_id = get_the_ID();
-    }
-    
-    $views = get_post_meta($post_id, '_shopora_post_views', true);
-    return $views ? intval($views) : 0;
-}
-endif;
+function shopora_custom_logo() {
+    if (has_custom_logo()) {
+        the_custom_logo();
+    } else {
+        echo '<div class="site-branding">';
+        echo '<h1 class="site-title"><a href="' . esc_url(home_url('/')) . '">' . esc_html(get_bloginfo('name')) . '</a></h1>';
 
-if (!function_exists('shopora_set_post_views')):
-/**
- * Set post view count
- */
-function shopora_set_post_views($post_id = null) {
-    if (!$post_id) {
-        $post_id = get_the_ID();
-    }
-    
-    $views = shopora_get_post_views($post_id);
-    update_post_meta($post_id, '_shopora_post_views', $views + 1);
-}
-endif;
-
-// Track post views
-function shopora_track_post_views() {
-    if (is_single() && !is_user_logged_in()) {
-        shopora_set_post_views();
-    }
-}
-add_action('wp_head', 'shopora_track_post_views');
-
-if (!function_exists('shopora_get_archive_description')):
-/**
- * Get custom archive description
- */
-function shopora_get_archive_description() {
-    $description = '';
-    
-    if (is_home()) {
-        $description = get_theme_mod('blog_description', __('Read our latest news and insights', 'shopora-premium-commerce'));
-    } elseif (is_category()) {
-        $description = category_description();
-    } elseif (is_tag()) {
-        $description = tag_description();
-    } elseif (is_author()) {
-        $description = get_the_author_meta('description');
-    } elseif (is_date()) {
-        if (is_year()) {
-            $description = sprintf(__('Posts from %s', 'shopora-premium-commerce'), get_the_date('Y'));
-        } elseif (is_month()) {
-            $description = sprintf(__('Posts from %s', 'shopora-premium-commerce'), get_the_date('F Y'));
-        } elseif (is_day()) {
-            $description = sprintf(__('Posts from %s', 'shopora-premium-commerce'), get_the_date());
+        $description = get_bloginfo('description', 'display');
+        if ($description || is_customize_preview()) {
+            echo '<p class="site-description">' . esc_html($description) . '</p>';
         }
+        echo '</div>';
     }
-    
-    return trim($description);
 }
 endif;
 
-if (!function_exists('shopora_get_color_scheme')):
+if (!function_exists('shopora_post_navigation')):
 /**
- * Get current color scheme
+ * Display post navigation
  */
-function shopora_get_color_scheme() {
-    return get_theme_mod('color_scheme', 'default');
+function shopora_post_navigation() {
+    if (!is_single()) {
+        return;
+    }
+
+    $prev_post = get_previous_post();
+    $next_post = get_next_post();
+
+    if (!$prev_post && !$next_post) {
+        return;
+    }
+
+    echo '<nav class="post-navigation" aria-label="' . esc_attr__('Post Navigation', 'shopora-premium-commerce') . '">';
+    echo '<div class="nav-links">';
+
+    if ($prev_post) {
+        echo '<div class="nav-previous">';
+        echo '<a href="' . esc_url(get_permalink($prev_post)) . '" rel="prev">';
+        echo '<span class="nav-subtitle">' . esc_html__('Previous Post', 'shopora-premium-commerce') . '</span>';
+        echo '<span class="nav-title">' . esc_html(get_the_title($prev_post)) . '</span>';
+        echo '</a>';
+        echo '</div>';
+    }
+
+    if ($next_post) {
+        echo '<div class="nav-next">';
+        echo '<a href="' . esc_url(get_permalink($next_post)) . '" rel="next">';
+        echo '<span class="nav-subtitle">' . esc_html__('Next Post', 'shopora-premium-commerce') . '</span>';
+        echo '<span class="nav-title">' . esc_html(get_the_title($next_post)) . '</span>';
+        echo '</a>';
+        echo '</div>';
+    }
+
+    echo '</div>';
+    echo '</nav>';
 }
 endif;
 
-if (!function_exists('shopora_is_dark_mode')):
-/**
- * Check if dark mode is enabled
- */
-function shopora_is_dark_mode() {
-    return get_theme_mod('dark_mode_enable', false);
-}
-endif;
 ?>

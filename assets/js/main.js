@@ -1,425 +1,301 @@
+// Vanilla JS for performance-critical functions
+document.addEventListener('DOMContentLoaded', function() {
+    
+    // Header scroll effect
+    const header = document.querySelector('.site-header');
+    let lastScrollTop = 0;
 
-/**
- * Main JavaScript file for Shopora Premium Commerce theme
- */
+    if (header) { // Check if header exists
+        window.addEventListener('scroll', function() {
+            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
 
-(function($) {
-    'use strict';
-
-    // Document ready
-    $(document).ready(function() {
-        initStickyHeader();
-        initSmoothScrolling();
-        initAnimations();
-        initMobileMenu();
-        initSearchToggle();
-        initFormValidation();
-        initProductQuickView();
-        initCartFunctionality();
-        initImageLazyLoading();
-        initTooltips();
-    });
-
-    /**
-     * Sticky Header
-     */
-    function initStickyHeader() {
-        const header = $('.site-header');
-        const headerHeight = header.outerHeight();
-        let lastScrollTop = 0;
-        
-        $(window).scroll(function() {
-            const scrollTop = $(this).scrollTop();
-            
-            if (scrollTop > headerHeight) {
-                header.addClass('scrolled');
-                
-                // Hide header on scroll down, show on scroll up
-                if (scrollTop > lastScrollTop && scrollTop > headerHeight * 2) {
-                    header.addClass('hidden');
-                } else {
-                    header.removeClass('hidden');
-                }
+            if (scrollTop > 100) {
+                header.classList.add('scrolled');
             } else {
-                header.removeClass('scrolled hidden');
+                header.classList.remove('scrolled');
             }
-            
+
+            // Hide header on scroll down, show on scroll up
+            if (scrollTop > lastScrollTop && scrollTop > 200) {
+                header.style.transform = 'translateY(-100%)';
+            } else {
+                header.style.transform = 'translateY(0)';
+            }
             lastScrollTop = scrollTop;
         });
     }
 
-    /**
-     * Smooth scrolling for anchor links
-     */
-    function initSmoothScrolling() {
-        $('a[href*="#"]:not([href="#"])').click(function() {
-            if (location.pathname.replace(/^\//, '') === this.pathname.replace(/^\//, '') && 
-                location.hostname === this.hostname) {
-                let target = $(this.hash);
-                target = target.length ? target : $('[name=' + this.hash.slice(1) + ']');
-                
-                if (target.length) {
-                    const headerHeight = $('.site-header').outerHeight();
-                    
-                    $('html, body').animate({
-                        scrollTop: target.offset().top - headerHeight - 20
-                    }, 1000, 'easeInOutCubic');
-                    
-                    return false;
-                }
-            }
+    // Mobile menu toggle
+    const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
+    const mainNavigation = document.querySelector('.main-navigation');
+    const body = document.body;
+
+    if (mobileMenuBtn && mainNavigation) {
+        mobileMenuBtn.addEventListener('click', function() {
+            const isExpanded = this.getAttribute('aria-expanded') === 'true';
+            this.setAttribute('aria-expanded', !isExpanded);
+            mainNavigation.classList.toggle('mobile-open');
+            body.classList.toggle('menu-open');
         });
     }
-
-    /**
-     * Initialize scroll animations
-     */
-    function initAnimations() {
-        // Intersection Observer for fade-in animations
-        if ('IntersectionObserver' in window) {
-            const animatedElements = document.querySelectorAll('.fade-in, .slide-up');
-            
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add('visible');
-                        observer.unobserve(entry.target);
-                    }
-                });
-            }, {
-                threshold: 0.1,
-                rootMargin: '0px 0px -50px 0px'
-            });
-            
-            animatedElements.forEach(el => observer.observe(el));
-        } else {
-            // Fallback for older browsers
-            $('.fade-in, .slide-up').addClass('visible');
+    
+    // Close menu when clicking outside
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('.main-navigation, .mobile-menu-btn') && body.classList.contains('menu-open')) {
+            mobileMenuBtn.setAttribute('aria-expanded', 'false');
+            mainNavigation.classList.remove('mobile-open');
+            body.classList.remove('menu-open');
         }
-        
-        // Counter animation
-        $('.counter').each(function() {
-            const $this = $(this);
-            const countTo = $this.attr('data-count');
-            
-            const observer = new IntersectionObserver((entries) => {
-                if (entries[0].isIntersecting) {
-                    $({ countNum: $this.text() }).animate({
-                        countNum: countTo
-                    }, {
-                        duration: 2000,
-                        easing: 'linear',
-                        step: function() {
-                            $this.text(Math.floor(this.countNum));
-                        },
-                        complete: function() {
-                            $this.text(this.countNum);
-                        }
-                    });
-                    observer.unobserve($this[0]);
-                }
-            });
-            
-            observer.observe($this[0]);
-        });
-    }
+    });
 
-    /**
-     * Mobile menu functionality
-     */
-    function initMobileMenu() {
-        const $mobileMenuBtn = $('.mobile-menu-btn');
-        const $navigation = $('.main-navigation');
-        const $body = $('body');
-        
-        $mobileMenuBtn.on('click', function() {
-            $(this).toggleClass('active');
-            $navigation.toggleClass('mobile-active');
-            $body.toggleClass('menu-open');
-            
-            // Toggle aria-expanded
-            const expanded = $(this).attr('aria-expanded') === 'true';
-            $(this).attr('aria-expanded', !expanded);
-        });
-        
-        // Close menu when clicking outside
-        $(document).on('click', function(e) {
-            if (!$(e.target).closest('.main-navigation, .mobile-menu-btn').length) {
-                $mobileMenuBtn.removeClass('active');
-                $navigation.removeClass('mobile-active');
-                $body.removeClass('menu-open');
-                $mobileMenuBtn.attr('aria-expanded', 'false');
-            }
-        });
-        
-        // Close menu on window resize
-        $(window).resize(function() {
-            if ($(window).width() > 768) {
-                $mobileMenuBtn.removeClass('active');
-                $navigation.removeClass('mobile-active');
-                $body.removeClass('menu-open');
-                $mobileMenuBtn.attr('aria-expanded', 'false');
-            }
-        });
-    }
+    // Close menu on window resize
+    window.addEventListener('resize', function() {
+        if (window.innerWidth > 768) {
+            if (mobileMenuBtn) mobileMenuBtn.setAttribute('aria-expanded', 'false');
+            if (mainNavigation) mainNavigation.classList.remove('mobile-open');
+            if (body) body.classList.remove('menu-open');
+        }
+    });
 
-    /**
-     * Search toggle functionality
-     */
-    function initSearchToggle() {
-        const $searchToggle = $('.search-toggle-btn');
-        const $searchContainer = $('.search-form-container');
-        
-        $searchToggle.on('click', function(e) {
+
+    // Search toggle
+    const searchToggle = document.querySelector('.search-toggle-btn');
+    const searchContainer = document.querySelector('.search-form-container');
+
+    if (searchToggle && searchContainer) {
+        searchToggle.addEventListener('click', function(e) {
             e.preventDefault();
-            $searchContainer.slideToggle(300);
+            const isExpanded = this.getAttribute('aria-expanded') === 'true';
+            this.setAttribute('aria-expanded', !isExpanded);
+            searchContainer.style.display = isExpanded ? 'none' : 'block';
             
-            setTimeout(function() {
-                $searchContainer.find('.search-field').focus();
-            }, 350);
-        });
-        
-        // Close search when clicking outside
-        $(document).on('click', function(e) {
-            if (!$(e.target).closest('.search-toggle, .search-form-container').length) {
-                $searchContainer.slideUp(300);
-            }
-        });
-    }
-
-    /**
-     * Form validation
-     */
-    function initFormValidation() {
-        // Contact form validation
-        $('#contact-form').on('submit', function(e) {
-            e.preventDefault();
-            
-            const $form = $(this);
-            const $submitBtn = $form.find('button[type="submit"]');
-            const originalText = $submitBtn.html();
-            
-            // Show loading state
-            $submitBtn.html('<span class="loading"></span> Sending...');
-            $submitBtn.prop('disabled', true);
-            
-            // Remove previous error messages
-            $form.find('.error-message').remove();
-            
-            let isValid = true;
-            
-            // Validate required fields
-            $form.find('[required]').each(function() {
-                const $field = $(this);
-                const value = $field.val().trim();
-                
-                if (!value) {
-                    showFieldError($field, 'This field is required.');
-                    isValid = false;
-                }
-            });
-            
-            // Validate email
-            const $email = $form.find('input[type="email"]');
-            const email = $email.val().trim();
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            
-            if (email && !emailRegex.test(email)) {
-                showFieldError($email, 'Please enter a valid email address.');
-                isValid = false;
-            }
-            
-            if (isValid) {
-                // Simulate form submission
+            if (!isExpanded) {
                 setTimeout(function() {
-                    $submitBtn.html('<i class="fas fa-check"></i> Message Sent!');
-                    $submitBtn.removeClass('btn-primary').addClass('btn-success');
-                    
-                    setTimeout(function() {
-                        $form[0].reset();
-                        $submitBtn.html(originalText);
-                        $submitBtn.removeClass('btn-success').addClass('btn-primary');
-                        $submitBtn.prop('disabled', false);
-                    }, 3000);
-                }, 2000);
-            } else {
-                $submitBtn.html(originalText);
-                $submitBtn.prop('disabled', false);
+                    const searchField = searchContainer.querySelector('.search-field');
+                    if (searchField) {
+                        searchField.focus();
+                    }
+                }, 50); // Small delay to ensure display is block
             }
         });
-        
-        function showFieldError($field, message) {
-            $field.addClass('error');
-            $field.after('<div class="error-message" style="color: var(--error-color); font-size: 0.875rem; margin-top: 0.25rem;">' + message + '</div>');
-            
-            $field.on('input focus', function() {
-                $(this).removeClass('error');
-                $(this).siblings('.error-message').remove();
-            });
-        }
+
+        // Close search when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.search-toggle-btn, .search-form-container') && searchContainer.style.display === 'block') {
+                searchToggle.setAttribute('aria-expanded', 'false');
+                searchContainer.style.display = 'none';
+            }
+        });
     }
 
-    /**
-     * Product quick view functionality
-     */
-    function initProductQuickView() {
-        $('.product-quick-view').on('click', function(e) {
+    // Smooth scroll for anchor links
+    const anchorLinks = document.querySelectorAll('a[href^="#"]:not([href="#"])');
+    anchorLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            const targetId = this.getAttribute('href');
+            const target = document.querySelector(targetId);
+            if (target) {
+                const headerElement = document.querySelector('.site-header');
+                const headerHeight = headerElement ? headerElement.offsetHeight : 0;
+                const targetOffsetTop = target.getBoundingClientRect().top + window.pageYOffset - headerHeight - 20;
+
+                window.scrollTo({
+                    top: targetOffsetTop,
+                    behavior: 'smooth'
+                });
+            }
+        });
+    });
+
+    // Fade in animations
+    const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+    };
+
+    const observer = new IntersectionObserver(function(entries) {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+                observer.unobserve(entry.target); // Unobserve after it becomes visible
+            }
+        });
+    }, observerOptions);
+
+    // Observe elements with fade-in class
+    document.querySelectorAll('.fade-in, .slide-up').forEach(el => {
+        observer.observe(el);
+    });
+
+    // Counter animation
+    const counters = document.querySelectorAll('.counter');
+    counters.forEach(counter => {
+        const observer = new IntersectionObserver(function(entries) {
+            if (entries[0].isIntersecting) {
+                const countTo = counter.getAttribute('data-count');
+                let countNum = parseInt(counter.textContent) || 0;
+
+                const animateCount = () => {
+                    if (countNum < countTo) {
+                        countNum += Math.ceil((countTo - countNum) / 20); // Simple animation
+                        counter.textContent = countNum;
+                        setTimeout(animateCount, 20);
+                    } else {
+                        counter.textContent = countTo;
+                    }
+                };
+                animateCount();
+                observer.unobserve(counter);
+            }
+        }, { threshold: 0.5 });
+        observer.observe(counter);
+    });
+
+
+    // Product quick view functionality
+    const quickViewButtons = document.querySelectorAll('.product-quick-view');
+    quickViewButtons.forEach(btn => {
+        btn.addEventListener('click', function(e) {
             e.preventDefault();
             
-            const productId = $(this).data('product-id');
+            const productId = this.dataset.productId;
             
             // Create modal
-            const modal = $(`
-                <div class="quick-view-modal">
-                    <div class="modal-overlay"></div>
-                    <div class="modal-content">
-                        <button class="modal-close">&times;</button>
-                        <div class="modal-body">
-                            <div class="loading-spinner">
-                                <span class="loading"></span>
-                                Loading product details...
-                            </div>
+            const modal = document.createElement('div');
+            modal.className = 'quick-view-modal';
+            modal.innerHTML = `
+                <div class="modal-overlay"></div>
+                <div class="modal-content">
+                    <button class="modal-close">&times;</button>
+                    <div class="modal-body">
+                        <div class="loading-spinner">
+                            <span class="loading"></span>
+                            Loading product details...
                         </div>
                     </div>
                 </div>
-            `);
-            
-            $('body').append(modal);
+            `;
+            document.body.appendChild(modal);
             
             // Load product data via AJAX
-            $.ajax({
-                url: shopora_ajax.ajax_url,
-                type: 'POST',
-                data: {
-                    action: 'shopora_product_quick_view',
-                    product_id: productId,
-                    nonce: shopora_ajax.nonce
-                },
-                success: function(response) {
-                    if (response.success) {
-                        modal.find('.modal-body').html(response.data);
-                    } else {
-                        modal.find('.modal-body').html('<p>Error loading product details.</p>');
-                    }
-                },
-                error: function() {
-                    modal.find('.modal-body').html('<p>Error loading product details.</p>');
-                }
-            });
-            
-            // Close modal functionality
-            modal.find('.modal-close, .modal-overlay').on('click', function() {
-                modal.fadeOut(300, function() {
-                    modal.remove();
-                });
-            });
-        });
-    }
+            // This part needs actual AJAX implementation using fetch or XMLHttpRequest
+            // For now, a placeholder:
+            setTimeout(() => {
+                modal.querySelector('.modal-body').innerHTML = `<p>Details for product ${productId}</p>`;
+            }, 1000);
 
-    /**
-     * Enhanced cart functionality
-     */
-    function initCartFunctionality() {
-        // Update cart count on add to cart
-        $(document).on('added_to_cart', function(event, fragments, cart_hash, $button) {
-            // Update cart count in header
-            if (fragments && fragments['.cart-count']) {
-                $('.cart-count').html(fragments['.cart-count']);
-            }
-            
-            // Show success message
-            showNotification('Product added to cart!', 'success');
+            // Close modal functionality
+            modal.querySelector('.modal-close, .modal-overlay').addEventListener('click', function() {
+                modal.remove();
+            });
         });
+    });
+
+    // Enhanced cart functionality
+    // Update cart count on add to cart
+    document.addEventListener('added_to_cart', function(event, fragments, cart_hash, $button) {
+        // Update cart count in header
+        const cartCountElement = document.querySelector('.cart-count');
+        if (cartCountElement && fragments && fragments['.cart-count']) {
+            cartCountElement.innerHTML = fragments['.cart-count'];
+        }
         
-        // Quantity input handlers
-        $(document).on('click', '.quantity-btn', function() {
-            const $btn = $(this);
-            const $input = $btn.siblings('input[type="number"]');
-            const currentVal = parseInt($input.val()) || 0;
-            const min = parseInt($input.attr('min')) || 1;
-            const max = parseInt($input.attr('max')) || 999;
+        // Show success message (requires a notification system)
+        // For now, a console log:
+        console.log('Product added to cart!');
+    });
+    
+    // Quantity input handlers
+    document.querySelectorAll('.quantity-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const input = this.closest('.quantity').querySelector('input[type="number"]');
+            const currentVal = parseInt(input.value) || 0;
+            const min = parseInt(input.min) || 1;
+            const max = parseInt(input.max) || 999;
             
-            if ($btn.hasClass('quantity-plus') && currentVal < max) {
-                $input.val(currentVal + 1).trigger('change');
-            } else if ($btn.hasClass('quantity-minus') && currentVal > min) {
-                $input.val(currentVal - 1).trigger('change');
+            if (this.classList.contains('quantity-plus') && currentVal < max) {
+                input.value = currentVal + 1;
+                input.dispatchEvent(new Event('change'));
+            } else if (this.classList.contains('quantity-minus') && currentVal > min) {
+                input.value = currentVal - 1;
+                input.dispatchEvent(new Event('change'));
             }
         });
-        
-        // Auto-update cart on quantity change
-        let updateTimer;
-        $(document).on('change', '.woocommerce-cart-form input[type="number"]', function() {
+    });
+
+    // Auto-update cart on quantity change
+    let updateTimer;
+    document.querySelectorAll('.woocommerce-cart-form input[type="number"]').forEach(input => {
+        input.addEventListener('change', function() {
             clearTimeout(updateTimer);
             updateTimer = setTimeout(function() {
-                $('[name="update_cart"]').trigger('click');
+                document.querySelector('[name="update_cart"]').click();
             }, 1000);
         });
-    }
+    });
 
-    /**
-     * Image lazy loading
-     */
-    function initImageLazyLoading() {
-        if ('IntersectionObserver' in window) {
-            const lazyImages = document.querySelectorAll('img[data-src]');
-            
-            const imageObserver = new IntersectionObserver((entries, observer) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        const img = entry.target;
-                        img.src = img.dataset.src;
-                        img.classList.remove('lazy');
-                        imageObserver.unobserve(img);
+    // Image lazy loading
+    if ('IntersectionObserver' in window) {
+        const lazyImages = document.querySelectorAll('img[data-src]');
+        
+        const imageObserver = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const img = entry.target;
+                    img.src = img.dataset.src;
+                    img.classList.remove('lazy');
+                    // Optionally load srcset too if present
+                    if (img.dataset.srcset) {
+                        img.srcset = img.dataset.srcset;
                     }
-                });
-            });
-            
-            lazyImages.forEach(img => imageObserver.observe(img));
-        }
-    }
-
-    /**
-     * Initialize tooltips
-     */
-    function initTooltips() {
-        $('[data-tooltip]').each(function() {
-            const $element = $(this);
-            const tooltipText = $element.data('tooltip');
-            
-            $element.on('mouseenter', function() {
-                const tooltip = $('<div class="tooltip">' + tooltipText + '</div>');
-                $('body').append(tooltip);
-                
-                const elementRect = this.getBoundingClientRect();
-                tooltip.css({
-                    position: 'fixed',
-                    top: elementRect.top - tooltip.outerHeight() - 10,
-                    left: elementRect.left + (elementRect.width / 2) - (tooltip.outerWidth() / 2),
-                    zIndex: 10000
-                });
-            });
-            
-            $element.on('mouseleave', function() {
-                $('.tooltip').remove();
+                    observer.unobserve(img);
+                }
             });
         });
+        
+        lazyImages.forEach(img => imageObserver.observe(img));
     }
 
-    /**
-     * Show notification
-     */
-    function showNotification(message, type = 'info') {
-        const notification = $(`
-            <div class="notification notification-${type}">
-                <span class="notification-message">${message}</span>
-                <button class="notification-close">&times;</button>
-            </div>
-        `);
+    // Initialize tooltips
+    document.querySelectorAll('[data-tooltip]').forEach(element => {
+        const tooltipText = element.dataset.tooltip;
         
-        $('body').append(notification);
+        element.addEventListener('mouseenter', function() {
+            const tooltip = document.createElement('div');
+            tooltip.className = 'tooltip';
+            tooltip.textContent = tooltipText;
+            document.body.appendChild(tooltip);
+            
+            const elementRect = this.getBoundingClientRect();
+            const tooltipRect = tooltip.getBoundingClientRect();
+
+            tooltip.style.position = 'fixed';
+            tooltip.style.top = `${elementRect.top - tooltipRect.height - 10}px`;
+            tooltip.style.left = `${elementRect.left + (elementRect.width / 2) - (tooltipRect.width / 2)}px`;
+            tooltip.style.zIndex = '10000';
+        });
+        
+        element.addEventListener('mouseleave', function() {
+            const tooltip = document.querySelector('.tooltip');
+            if (tooltip) {
+                tooltip.remove();
+            }
+        });
+    });
+
+    // Notification system (basic implementation)
+    function showNotification(message, type = 'info') {
+        const notification = document.createElement('div');
+        notification.className = `notification notification-${type}`;
+        notification.innerHTML = `
+            <span class="notification-message">${message}</span>
+            <button class="notification-close">&times;</button>
+        `;
+        document.body.appendChild(notification);
         
         setTimeout(() => {
-            notification.addClass('show');
+            notification.classList.add('show');
         }, 100);
         
         // Auto hide after 5 seconds
@@ -428,71 +304,260 @@
         }, 5000);
         
         // Manual close
-        notification.find('.notification-close').on('click', () => {
+        notification.querySelector('.notification-close').addEventListener('click', () => {
             hideNotification(notification);
         });
         
         function hideNotification($notification) {
-            $notification.removeClass('show');
+            $notification.classList.remove('show');
             setTimeout(() => {
                 $notification.remove();
             }, 300);
         }
     }
 
-    /**
-     * Parallax effect for hero section
-     */
-    function initParallax() {
-        const $heroSection = $('.hero-section');
-        
-        if ($heroSection.length) {
-            $(window).on('scroll', function() {
-                const scrollTop = $(window).scrollTop();
-                const rate = scrollTop * -0.5;
-                
-                $heroSection.css('transform', 'translateY(' + rate + 'px)');
-            });
-        }
+    // Parallax effect for hero section
+    const heroSection = document.querySelector('.hero-section');
+    if (heroSection) {
+        window.addEventListener('scroll', function() {
+            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            const rate = scrollTop * -0.5;
+            heroSection.style.transform = `translateY(${rate}px)`;
+        });
     }
 
-    /**
-     * Back to top button
-     */
-    function initBackToTop() {
-        const backToTop = $('<button class="back-to-top" aria-label="Back to top"><i class="fas fa-arrow-up"></i></button>');
-        $('body').append(backToTop);
-        
-        $(window).on('scroll', function() {
-            if ($(window).scrollTop() > 300) {
-                backToTop.addClass('show');
+    // Back to top button
+    const backToTopBtn = document.createElement('button');
+    backToTopBtn.innerHTML = '<i class="fas fa-arrow-up"></i>';
+    backToTopBtn.className = 'back-to-top';
+    backToTopBtn.setAttribute('aria-label', 'Back to top');
+    document.body.appendChild(backToTopBtn);
+
+    backToTopBtn.addEventListener('click', function() {
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
+    });
+
+    window.addEventListener('scroll', function() {
+        if (window.pageYOffset > 300) {
+            backToTopBtn.classList.add('visible');
+        } else {
+            backToTopBtn.classList.remove('visible');
+        }
+    });
+
+    // Form validation
+    const forms = document.querySelectorAll('form');
+    forms.forEach(form => {
+        form.addEventListener('submit', function(e) {
+            const requiredFields = form.querySelectorAll('[required]');
+            let isValid = true;
+
+            requiredFields.forEach(field => {
+                if (!field.value.trim()) {
+                    field.classList.add('error');
+                    // Add error message if not already present
+                    if (!field.nextElementSibling || !field.nextElementSibling.classList.contains('error-message')) {
+                        const errorMessage = document.createElement('div');
+                        errorMessage.className = 'error-message';
+                        errorMessage.style.color = 'var(--error-color)'; // Assuming this CSS variable exists
+                        errorMessage.style.fontSize = '0.875rem';
+                        errorMessage.style.marginTop = '0.25rem';
+                        errorMessage.textContent = 'This field is required.';
+                        field.after(errorMessage);
+                    }
+                    isValid = false;
+                } else {
+                    field.classList.remove('error');
+                    if (field.nextElementSibling && field.nextElementSibling.classList.contains('error-message')) {
+                        field.nextElementSibling.remove();
+                    }
+                }
+            });
+
+            // Email validation
+            const emailField = form.querySelector('input[type="email"]');
+            if (emailField && emailField.value.trim()) {
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailRegex.test(emailField.value.trim())) {
+                    emailField.classList.add('error');
+                     if (!emailField.nextElementSibling || !emailField.nextElementSibling.classList.contains('error-message')) {
+                        const errorMessage = document.createElement('div');
+                        errorMessage.className = 'error-message';
+                        errorMessage.style.color = 'var(--error-color)';
+                        errorMessage.style.fontSize = '0.875rem';
+                        errorMessage.style.marginTop = '0.25rem';
+                        errorMessage.textContent = 'Please enter a valid email address.';
+                        emailField.after(errorMessage);
+                    }
+                    isValid = false;
+                } else {
+                    emailField.classList.remove('error');
+                    if (emailField.nextElementSibling && emailField.nextElementSibling.classList.contains('error-message')) {
+                        emailField.nextElementSibling.remove();
+                    }
+                }
+            }
+
+            if (!isValid) {
+                e.preventDefault();
             } else {
-                backToTop.removeClass('show');
+                // Simulate form submission success for demonstration
+                if (form.id === 'contact-form') {
+                    e.preventDefault(); // Prevent actual submission for this example
+                    const submitBtn = form.querySelector('button[type="submit"]');
+                    const originalText = submitBtn.innerHTML;
+
+                    submitBtn.innerHTML = '<span class="loading"></span> Sending...';
+                    submitBtn.disabled = true;
+
+                    setTimeout(() => {
+                        submitBtn.innerHTML = '<i class="fas fa-check"></i> Message Sent!';
+                        submitBtn.className = 'btn-success'; // Assuming a class for success state
+                        setTimeout(() => {
+                            form.reset();
+                            submitBtn.innerHTML = originalText;
+                            submitBtn.className = 'btn-primary'; // Assuming a class for primary state
+                            submitBtn.disabled = false;
+                        }, 3000);
+                    }, 2000);
+                }
             }
         });
-        
-        backToTop.on('click', function() {
-            $('html, body').animate({
-                scrollTop: 0
-            }, 1000, 'easeInOutCubic');
+
+        // Remove error classes and messages on input/focus
+        form.querySelectorAll('[required], input[type="email"]').forEach(field => {
+            field.addEventListener('input', function() {
+                this.classList.remove('error');
+                if (this.nextElementSibling && this.nextElementSibling.classList.contains('error-message')) {
+                    this.nextElementSibling.remove();
+                }
+            });
+            field.addEventListener('focus', function() {
+                 this.classList.remove('error');
+                if (this.nextElementSibling && this.nextElementSibling.classList.contains('error-message')) {
+                    this.nextElementSibling.remove();
+                }
+            });
+        });
+    });
+});
+
+// AJAX functionality for WordPress
+window.ShoporaTheme = {
+    ajaxUrl: window.location.origin + '/wp-admin/admin-ajax.php',
+
+    // Load more posts
+    loadMorePosts: function(button) {
+        const page = parseInt(button.dataset.page) + 1;
+        const maxPages = parseInt(button.dataset.maxPages);
+
+        if (page > maxPages) {
+            button.style.display = 'none';
+            return;
+        }
+
+        button.innerHTML = '<span class="loading"></span> Loading...';
+        button.disabled = true;
+
+        // AJAX request using fetch
+        fetch(this.ajaxUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: new URLSearchParams({
+                action: 'shopora_load_more_posts',
+                page: page,
+                // Add other parameters like nonce, category, etc. as needed
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success && data.html) {
+                const postsContainer = button.closest('.posts-container') || document.querySelector('.posts-container'); // Adjust selector as needed
+                if (postsContainer) {
+                    postsContainer.insertAdjacentHTML('beforeend', data.html);
+                }
+                button.dataset.page = page;
+            }
+            button.innerHTML = 'Load More';
+            button.disabled = false;
+            if (page >= maxPages) {
+                button.style.display = 'none';
+            }
+        })
+        .catch(error => {
+            console.error('Error loading more posts:', error);
+            button.innerHTML = 'Load More';
+            button.disabled = false;
+        });
+    },
+
+    // Update cart count
+    updateCartCount: function(count) {
+        const cartCountElement = document.querySelector('.cart-count');
+        if (cartCountElement) {
+            cartCountElement.textContent = count;
+            cartCountElement.style.display = count > 0 ? 'flex' : 'none';
+        }
+    },
+
+    // Placeholder for quick view AJAX
+    fetchProductQuickView: function(productId, callback) {
+        fetch(this.ajaxUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: new URLSearchParams({
+                action: 'shopora_product_quick_view',
+                product_id: productId,
+                // nonce: shopora_ajax.nonce // Add nonce if available
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success && data.data) {
+                callback(null, data.data);
+            } else {
+                callback(data.data || 'An error occurred');
+            }
+        })
+        .catch(error => {
+            callback(error);
         });
     }
+};
 
-    // Initialize additional features
-    initParallax();
-    initBackToTop();
+// Event listener for AJAX 'added_to_cart'
+document.addEventListener('added_to_cart', function(event, fragments, cart_hash, $button) {
+    if (window.ShoporaTheme && window.ShoporaTheme.updateCartCount) {
+        const cartCountElement = document.querySelector('.cart-count');
+        if (cartCountElement) {
+            window.ShoporaTheme.updateCartCount(cartCountElement.textContent); // Or get count from fragments
+        }
+    }
+    // Basic notification
+    const notification = document.createElement('div');
+    notification.className = 'notification notification-success show';
+    notification.innerHTML = '<span class="notification-message">Product added to cart!</span><button class="notification-close">&times;</button>';
+    document.body.appendChild(notification);
 
-    // Custom easing function
-    $.easing.easeInOutCubic = function(x, t, b, c, d) {
-        if ((t /= d / 2) < 1) return c / 2 * t * t * t + b;
-        return c / 2 * ((t -= 2) * t * t + 2) + b;
-    };
+    setTimeout(() => {
+        notification.classList.remove('show');
+        setTimeout(() => notification.remove(), 300);
+    }, 5000);
+    notification.querySelector('.notification-close').addEventListener('click', () => {
+        notification.classList.remove('show');
+        setTimeout(() => notification.remove(), 300);
+    });
+});
 
-})(jQuery);
-
-// Vanilla JS for performance-critical functions
+// Initialize features that need to run on load
 document.addEventListener('DOMContentLoaded', function() {
-    
     // Preload critical images
     const criticalImages = [
         '/wp-content/themes/shopora-premium-commerce/assets/images/hero-bg.jpg'
@@ -506,7 +571,50 @@ document.addEventListener('DOMContentLoaded', function() {
     // Service Worker registration for PWA features
     if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('/sw.js')
-            .then(registration => console.log('SW registered'))
-            .catch(error => console.log('SW registration failed'));
+            .then(registration => console.log('SW registered: ', registration))
+            .catch(error => console.log('SW registration failed: ', error));
     }
+
+    // Initialize Load More button if it exists
+    document.querySelectorAll('.load-more-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            window.ShoporaTheme.loadMorePosts(this);
+        });
+    });
+
+    // Initialize Quick View buttons
+    document.querySelectorAll('.product-quick-view').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            const productId = this.dataset.productId;
+            
+            const modal = document.createElement('div');
+            modal.className = 'quick-view-modal';
+            modal.innerHTML = `
+                <div class="modal-overlay"></div>
+                <div class="modal-content">
+                    <button class="modal-close">&times;</button>
+                    <div class="modal-body">
+                        <div class="loading-spinner">
+                            <span class="loading"></span>
+                            Loading product details...
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+
+            const closeModal = () => modal.remove();
+            modal.querySelector('.modal-close, .modal-overlay').addEventListener('click', closeModal);
+
+            window.ShoporaTheme.fetchProductQuickView(productId, (error, data) => {
+                if (error) {
+                    modal.querySelector('.modal-body').innerHTML = `<p>${error}</p>`;
+                } else {
+                    modal.querySelector('.modal-body').innerHTML = data;
+                    // Re-initialize any scripts needed for the modal content if necessary
+                }
+            });
+        });
+    });
 });

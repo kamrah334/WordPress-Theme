@@ -17,3 +17,20 @@ if (!is_active_sidebar(shopora_get_sidebar_id())) {
 
     <?php dynamic_sidebar(shopora_get_sidebar_id()); ?>
 </aside>
+<?php
+/**
+ * The sidebar containing the main widget area
+ *
+ * @package Shopora_Premium_Commerce
+ */
+
+if (!is_active_sidebar(shopora_get_sidebar_id())) {
+    return;
+}
+?>
+
+<aside id="secondary" class="widget-area sidebar <?php echo esc_attr(shopora_get_sidebar_id()); ?>">
+    <div class="sidebar-content">
+        <?php dynamic_sidebar(shopora_get_sidebar_id()); ?>
+    </div>
+</aside><!-- #secondary -->

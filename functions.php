@@ -86,7 +86,10 @@ function shopora_scripts() {
     // Enqueue Font Awesome
     wp_enqueue_style('font-awesome', 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css', array(), '6.5.0');
 
-    // Enqueue main JavaScript
+    // Enqueue jQuery from WordPress core
+    wp_enqueue_script('jquery');
+
+    // Enqueue main JavaScript with jQuery dependency
     wp_enqueue_script('shopora-main', get_template_directory_uri() . '/assets/js/main.js', array('jquery'), wp_get_theme()->get('Version'), true);
 
     // Localize script for AJAX
@@ -94,6 +97,7 @@ function shopora_scripts() {
         'ajax_url' => admin_url('admin-ajax.php'),
         'nonce' => wp_create_nonce('shopora_nonce'),
         'home_url' => home_url('/'),
+        'wc_ajax_url' => class_exists('WooCommerce') ? WC_AJAX::get_endpoint('%%endpoint%%') : '',
     ));
 
     // Enqueue comment reply script
