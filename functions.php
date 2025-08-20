@@ -237,7 +237,11 @@ function shopora_setup() {
     add_image_size('shopora-blog-grid', 400, 300, true);
     add_image_size('shopora-product-grid', 300, 300, true);
 }
-add_action('after_setup_theme', 'shopora_setup');
+if (function_exists('add_action')) {
+    add_action('after_setup_theme', 'shopora_setup');
+} else {
+    shopora_setup();
+}
 
 /**
  * Enqueue scripts and styles
@@ -273,7 +277,11 @@ function shopora_scripts() {
         wp_enqueue_script('comment-reply');
     }
 }
-add_action('wp_enqueue_scripts', 'shopora_scripts');
+if (function_exists('add_action')) {
+    add_action('wp_enqueue_scripts', 'shopora_scripts');
+} else {
+    shopora_scripts();
+}
 
 /**
  * Get Google Fonts URL
@@ -341,7 +349,9 @@ function shopora_widgets_init() {
         ));
     }
 }
-add_action('widgets_init', 'shopora_widgets_init');
+if (function_exists('add_action')) {
+    add_action('widgets_init', 'shopora_widgets_init');
+}
 
 /**
  * Customizer settings
@@ -506,7 +516,9 @@ function shopora_customize_register($wp_customize) {
         ));
     }
 }
-add_action('customize_register', 'shopora_customize_register');
+if (function_exists('add_action')) {
+    add_action('customize_register', 'shopora_customize_register');
+}
 
 /**
  * Output custom styles based on customizer settings
@@ -553,7 +565,9 @@ function shopora_custom_styles() {
 
     wp_add_inline_style('shopora-style', $custom_css);
 }
-add_action('wp_enqueue_scripts', 'shopora_custom_styles');
+if (function_exists('add_action')) {
+    add_action('wp_enqueue_scripts', 'shopora_custom_styles');
+}
 
 /**
  * Helper function to check if sidebar should be displayed
@@ -643,7 +657,11 @@ if (class_exists('WooCommerce')) {
         // Remove default WooCommerce styles
         add_filter('woocommerce_enqueue_styles', '__return_empty_array');
     }
-    add_action('after_setup_theme', 'shopora_woocommerce_setup');
+    if (function_exists('add_action')) {
+        add_action('after_setup_theme', 'shopora_woocommerce_setup');
+    } else {
+        shopora_woocommerce_setup();
+    }
 }
 
 ?>

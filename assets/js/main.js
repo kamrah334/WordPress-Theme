@@ -1,15 +1,49 @@
-
 /**
  * Shopora Premium Commerce Theme JavaScript
  */
+
+// Mobile menu toggle
+document.addEventListener('DOMContentLoaded', function() {
+    const mobileMenuButton = document.getElementById('mobile-menu-button');
+    const mobileMenu = document.getElementById('mobile-menu');
+
+    if (mobileMenuButton && mobileMenu) {
+        mobileMenuButton.addEventListener('click', function() {
+            mobileMenu.classList.toggle('hidden');
+
+            // Toggle icon
+            const icon = mobileMenuButton.querySelector('i');
+            if (mobileMenu.classList.contains('hidden')) {
+                icon.classList.remove('fa-times');
+                icon.classList.add('fa-bars');
+            } else {
+                icon.classList.remove('fa-bars');
+                icon.classList.add('fa-times');
+            }
+        });
+    }
+
+    // Close mobile menu when clicking outside
+    document.addEventListener('click', function(event) {
+        if (mobileMenu && !mobileMenu.contains(event.target) && !mobileMenuButton.contains(event.target)) {
+            mobileMenu.classList.add('hidden');
+            const icon = mobileMenuButton.querySelector('i');
+            icon.classList.remove('fa-times');
+            icon.classList.add('fa-bars');
+        }
+    });
+
+    // Console log for debugging
+    console.log('Shopora Premium Commerce Theme Loaded');
+});
+
 
 (function($) {
     'use strict';
 
     // DOM Ready
     $(document).ready(function() {
-        initializeTheme();
-        initializeMobileMenu();
+        // initializeTheme(); // Already handled by DOMContentLoaded
         initializeSearchToggle();
         initializeScrollEffects();
         initializeAnimations();
@@ -20,47 +54,47 @@
     /**
      * Initialize theme functionality
      */
-    function initializeTheme() {
-        console.log('Shopora Premium Commerce Theme Loaded');
-        
-        // Handle window resize
-        $(window).on('resize', function() {
-            handleResponsiveElements();
-        });
-        
-        // Handle scroll events
-        $(window).on('scroll', function() {
-            handleHeaderScroll();
-            handleScrollAnimations();
-        });
-    }
+    // function initializeTheme() {
+    //     console.log('Shopora Premium Commerce Theme Loaded'); // Already handled by DOMContentLoaded
+
+    //     // Handle window resize
+    //     $(window).on('resize', function() {
+    //         handleResponsiveElements();
+    //     });
+
+    //     // Handle scroll events
+    //     $(window).on('scroll', function() {
+    //         handleHeaderScroll();
+    //         handleScrollAnimations();
+    //     });
+    // }
 
     /**
      * Mobile menu functionality
      */
-    function initializeMobileMenu() {
-        $('#mobile-menu-toggle').on('click', function(e) {
-            e.preventDefault();
-            const mobileMenu = $('#mobile-menu');
-            const isHidden = mobileMenu.hasClass('hidden');
-            
-            if (isHidden) {
-                mobileMenu.removeClass('hidden').addClass('block');
-                $(this).attr('aria-expanded', 'true');
-            } else {
-                mobileMenu.removeClass('block').addClass('hidden');
-                $(this).attr('aria-expanded', 'false');
-            }
-        });
+    // function initializeMobileMenu() {
+    //     $('#mobile-menu-toggle').on('click', function(e) {
+    //         e.preventDefault();
+    //         const mobileMenu = $('#mobile-menu');
+    //         const isHidden = mobileMenu.hasClass('hidden');
 
-        // Close mobile menu when clicking outside
-        $(document).on('click', function(e) {
-            if (!$(e.target).closest('#mobile-menu, #mobile-menu-toggle').length) {
-                $('#mobile-menu').removeClass('block').addClass('hidden');
-                $('#mobile-menu-toggle').attr('aria-expanded', 'false');
-            }
-        });
-    }
+    //         if (isHidden) {
+    //             mobileMenu.removeClass('hidden').addClass('block');
+    //             $(this).attr('aria-expanded', 'true');
+    //         } else {
+    //             mobileMenu.removeClass('block').addClass('hidden');
+    //             $(this).attr('aria-expanded', 'false');
+    //         }
+    //     });
+
+    //     // Close mobile menu when clicking outside
+    //     $(document).on('click', function(e) {
+    //         if (!$(e.target).closest('#mobile-menu, #mobile-menu-toggle').length) {
+    //             $('#mobile-menu').removeClass('block').addClass('hidden');
+    //             $('#mobile-menu-toggle').attr('aria-expanded', 'false');
+    //         }
+    //     });
+    // }
 
     /**
      * Search toggle functionality
@@ -70,7 +104,7 @@
             e.preventDefault();
             const searchForm = $('#search-form');
             const isHidden = searchForm.hasClass('hidden');
-            
+
             if (isHidden) {
                 searchForm.removeClass('hidden').addClass('block');
                 searchForm.find('input[type="search"]').focus();
@@ -93,7 +127,7 @@
     function handleHeaderScroll() {
         const header = $('.site-header');
         const scrollTop = $(window).scrollTop();
-        
+
         if (scrollTop > 100) {
             header.addClass('scrolled');
         } else {
@@ -152,9 +186,9 @@
         $(document).on('click', '.ajax_add_to_cart', function(e) {
             const $button = $(this);
             const productId = $button.data('product_id');
-            
+
             $button.addClass('loading').attr('disabled', true);
-            
+
             // Simulate AJAX request for development
             setTimeout(function() {
                 $button.removeClass('loading').attr('disabled', false);
@@ -169,19 +203,19 @@
             const $input = $(this).siblings('input[type="number"]');
             const currentVal = parseInt($input.val()) || 0;
             const isIncrement = $(this).hasClass('plus');
-            
+
             if (isIncrement) {
                 $input.val(currentVal + 1);
             } else if (currentVal > 1) {
                 $input.val(currentVal - 1);
             }
-            
+
             $input.trigger('change');
         });
 
         // Product image gallery
         initializeProductGallery();
-        
+
         // Quick view functionality
         initializeQuickView();
     }
@@ -195,11 +229,11 @@
             const $mainImage = $('.product-main-image img');
             const newSrc = $this.attr('src');
             const newAlt = $this.attr('alt');
-            
+
             $mainImage.fadeOut(200, function() {
                 $(this).attr('src', newSrc).attr('alt', newAlt).fadeIn(200);
             });
-            
+
             $('.product-gallery img').removeClass('active');
             $this.addClass('active');
         });
@@ -212,7 +246,7 @@
         $(document).on('click', '.quick-view-btn', function(e) {
             e.preventDefault();
             const productId = $(this).data('product-id');
-            
+
             // Show loading modal
             showQuickViewModal(productId);
         });
@@ -238,9 +272,9 @@
                 </div>
             </div>
         `;
-        
+
         $('body').append(modalHTML);
-        
+
         // Close modal functionality
         $('#quick-view-modal').on('click', function(e) {
             if (e.target === this || $(e.target).closest('.fa-times').length) {
@@ -287,15 +321,15 @@
                 </div>
             </div>
         `;
-        
+
         const $notification = $(notificationHTML);
         $('body').append($notification);
-        
+
         // Animate in
         setTimeout(function() {
             $notification.removeClass('translate-x-full');
         }, 100);
-        
+
         // Auto remove
         setTimeout(function() {
             $notification.addClass('translate-x-full');
@@ -310,7 +344,7 @@
      */
     function handleResponsiveElements() {
         const windowWidth = $(window).width();
-        
+
         // Close mobile menu on larger screens
         if (windowWidth >= 1024) {
             $('#mobile-menu').removeClass('block').addClass('hidden');
@@ -325,7 +359,7 @@
         $('.fade-in:not(.visible)').each(function() {
             const elementTop = $(this).offset().top;
             const windowBottom = $(window).scrollTop() + $(window).height();
-            
+
             if (elementTop < windowBottom - 100) {
                 $(this).addClass('visible');
             }
@@ -344,26 +378,26 @@
                     $(':root').css('--primary-color', newval);
                 });
             });
-            
+
             wp.customize('secondary_color', function(value) {
                 value.bind(function(newval) {
                     $(':root').css('--secondary-color', newval);
                 });
             });
-            
+
             // Typography updates
             wp.customize('heading_font_family', function(value) {
                 value.bind(function(newval) {
                     $(':root').css('--heading-font', `'${newval}', sans-serif`);
                 });
             });
-            
+
             wp.customize('body_font_family', function(value) {
                 value.bind(function(newval) {
                     $(':root').css('--body-font', `'${newval}', sans-serif`);
                 });
             });
-            
+
             // Footer content updates
             wp.customize('footer_copyright', function(value) {
                 value.bind(function(newval) {
@@ -379,7 +413,7 @@
     $(window).on('load', function() {
         // Remove loading classes
         $('body').removeClass('loading');
-        
+
         // Initialize any load-dependent functionality
         handleResponsiveElements();
     });
