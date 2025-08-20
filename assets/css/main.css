@@ -1,3 +1,18 @@
+/* Shopora Theme CSS */
+
+.site-header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+}
+
+.site-main {
+    min-height: 50vh;
+}
+
+.site-footer {
+    margin-top: auto;
+}
 
 /* Enhanced Shopora Premium Commerce Theme Styles */
 
@@ -215,7 +230,7 @@ a:hover {
 .site-header {
     background: var(--background-color);
     box-shadow: var(--shadow-sm);
-    position: fixed;
+    
     top: 0;
     width: 100%;
     z-index: 1000;
@@ -453,7 +468,7 @@ a:hover {
 /* Main Content */
 .site-main {
     padding-top: 80px;
-    min-height: calc(100vh - 80px);
+    
 }
 
 /* Page Layouts */
