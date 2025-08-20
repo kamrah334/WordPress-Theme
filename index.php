@@ -242,6 +242,96 @@ if (!defined('ABSPATH')) {
                 echo 'Latest Posts';
             }
         }
+        
+        if (!function_exists('esc_attr')) {
+            function esc_attr($text) {
+                return htmlspecialchars($text, ENT_QUOTES, 'UTF-8');
+            }
+        }
+        
+        if (!function_exists('esc_attr_e')) {
+            function esc_attr_e($text, $domain = '') {
+                echo esc_attr($text);
+            }
+        }
+        
+        if (!function_exists('get_theme_mod')) {
+            function get_theme_mod($name, $default = '') {
+                return $default;
+            }
+        }
+        
+        if (!function_exists('has_custom_logo')) {
+            function has_custom_logo() {
+                return false;
+            }
+        }
+        
+        if (!function_exists('the_custom_logo')) {
+            function the_custom_logo() {
+                return '';
+            }
+        }
+        
+        if (!function_exists('wp_nav_menu')) {
+            function wp_nav_menu($args = array()) {
+                echo '<ul class="flex items-center space-x-8">';
+                echo '<li><a href="/" class="text-gray-700 hover:text-purple-600 font-medium transition-colors">Home</a></li>';
+                echo '<li><a href="/shop.php" class="text-gray-700 hover:text-purple-600 font-medium transition-colors">Shop</a></li>';
+                echo '<li><a href="#" class="text-gray-700 hover:text-purple-600 font-medium transition-colors">Blog</a></li>';
+                echo '<li><a href="#" class="text-gray-700 hover:text-purple-600 font-medium transition-colors">About</a></li>';
+                echo '<li><a href="#" class="text-gray-700 hover:text-purple-600 font-medium transition-colors">Contact</a></li>';
+                echo '</ul>';
+            }
+        }
+        
+        if (!function_exists('get_search_query')) {
+            function get_search_query() {
+                return '';
+            }
+        }
+        
+        if (!function_exists('is_active_sidebar')) {
+            function is_active_sidebar($sidebar) {
+                return true;
+            }
+        }
+        
+        if (!function_exists('dynamic_sidebar')) {
+            function dynamic_sidebar($sidebar) {
+                return true;
+            }
+        }
+        
+        if (!function_exists('wp_footer')) {
+            function wp_footer() {
+                echo '<script>console.log("WordPress footer hook");</script>';
+            }
+        }
+        
+        // Mock WooCommerce functions
+        if (!class_exists('WooCommerce')) {
+            class WooCommerce {
+                public $cart;
+                
+                public function __construct() {
+                    $this->cart = new stdClass();
+                    $this->cart->get_cart_contents_count = function() { return 0; };
+                }
+            }
+            
+            function WC() {
+                static $wc = null;
+                if ($wc === null) {
+                    $wc = new WooCommerce();
+                }
+                return $wc;
+            }
+            
+            function wc_get_cart_url() {
+                return '/cart';
+            }
+        }
     }
 }
 

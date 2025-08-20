@@ -12,6 +12,11 @@
             "name": "full-width",
             "title": "Full Width",
             "postTypes": ["page"]
+        },
+        {
+            "name": "landing-page",
+            "title": "Landing Page",
+            "postTypes": ["page"]
         }
     ],
     "settings": {
@@ -100,6 +105,11 @@
                     "gradient": "linear-gradient(135deg, #1e293b 0%, #374151 100%)",
                     "name": "Dark Gradient",
                     "slug": "dark-gradient"
+                },
+                {
+                    "gradient": "linear-gradient(135deg, #f8fafc 0%, #ffffff 100%)",
+                    "name": "Light Gradient",
+                    "slug": "light-gradient"
                 }
             ]
         },
@@ -262,6 +272,18 @@
             "core/cover": {
                 "spacing": {
                     "padding": true
+                }
+            },
+            "core/group": {
+                "spacing": {
+                    "padding": true,
+                    "margin": true
+                }
+            },
+            "core/columns": {
+                "spacing": {
+                    "padding": true,
+                    "margin": true
                 }
             }
         }
@@ -427,6 +449,11 @@
             "name": "footer",
             "title": "Footer",
             "area": "footer"
+        },
+        {
+            "name": "sidebar",
+            "title": "Sidebar",
+            "area": "uncategorized"
         }
     ]
 }

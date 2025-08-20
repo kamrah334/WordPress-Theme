@@ -1,103 +1,120 @@
 
 <?php
 /**
- * The Template for displaying product archives, including the main shop page
- *
- * @package Shopora_Premium_Commerce
+ * WooCommerce Shop Page Template
  */
 
-defined('ABSPATH') || exit;
-
-get_header('shop');
-?>
+get_header('shop'); ?>
 
 <div class="bg-gray-50 min-h-screen">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         
-        <?php if (apply_filters('woocommerce_show_page_title', true)) : ?>
-            <header class="text-center mb-12">
-                <h1 class="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-                    <?php woocommerce_page_title(); ?>
-                </h1>
-                <p class="text-xl text-gray-600 max-w-2xl mx-auto">
-                    <?php esc_html_e('Discover our premium collection of carefully curated products', 'shopora-premium-commerce'); ?>
-                </p>
-                <?php do_action('woocommerce_archive_description'); ?>
-            </header>
-        <?php endif; ?>
+        <!-- Shop Header -->
+        <header class="text-center mb-12">
+            <h1 class="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+                <?php woocommerce_page_title(); ?>
+            </h1>
+            <?php if (category_description()) : ?>
+                <div class="text-xl text-gray-600 max-w-2xl mx-auto">
+                    <?php echo category_description(); ?>
+                </div>
+            <?php endif; ?>
+        </header>
 
         <div class="flex flex-col lg:flex-row gap-8">
             
             <!-- Sidebar -->
-            <?php if (shopora_show_sidebar()) : ?>
-                <aside class="w-full lg:w-80 xl:w-96 order-2 lg:order-1">
+            <?php if (is_active_sidebar('shop-sidebar')) : ?>
+                <aside class="w-full lg:w-80 xl:w-96">
                     <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 sticky top-24">
-                        <h3 class="text-lg font-semibold text-gray-900 mb-6">
-                            <i class="fas fa-filter mr-2"></i>
-                            <?php esc_html_e('Filter Products', 'shopora-premium-commerce'); ?>
-                        </h3>
                         <?php dynamic_sidebar('shop-sidebar'); ?>
                     </div>
                 </aside>
             <?php endif; ?>
 
-            <!-- Main Shop Content -->
-            <div class="flex-1 order-1 lg:order-2">
-                
-                <!-- Shop Toolbar -->
-                <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 mb-8">
-                    <div class="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
-                        <div class="flex items-center text-sm text-gray-600">
+            <!-- Main Content -->
+            <div class="flex-1">
+                <?php if (woocommerce_product_loop()) : ?>
+
+                    <!-- Shop Toolbar -->
+                    <div class="flex flex-col sm:flex-row justify-between items-center mb-8 p-4 bg-white rounded-xl shadow-sm border border-gray-100">
+                        <div class="mb-4 sm:mb-0">
                             <?php woocommerce_result_count(); ?>
                         </div>
-                        <div class="flex items-center space-x-4">
-                            <label for="orderby" class="text-sm text-gray-600">
-                                <?php esc_html_e('Sort by:', 'shopora-premium-commerce'); ?>
-                            </label>
+                        <div>
                             <?php woocommerce_catalog_ordering(); ?>
                         </div>
                     </div>
-                </div>
 
-                <?php
-                if (woocommerce_product_loop()) {
-                    do_action('woocommerce_before_shop_loop');
+                    <!-- Products Grid -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                        <?php
+                        woocommerce_product_loop_start();
 
-                    echo '<div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">';
-
-                    if (wc_get_loop_prop('is_shortcode')) {
-                        $products = wc_get_loop_prop('products');
-                        if ($products && $products->have_posts()) {
-                            while ($products->have_posts()) {
-                                $products->the_post();
-                                do_action('woocommerce_shop_loop');
-                                wc_get_template_part('content', 'product');
-                            }
+                        if (wc_get_loop_prop('is_shortcode')) {
+                            $columns = absint(wc_get_loop_prop('columns'));
                         }
-                        wp_reset_postdata();
-                    } else {
-                        if (have_posts()) {
-                            while (have_posts()) {
-                                the_post();
-                                do_action('woocommerce_shop_loop');
-                                wc_get_template_part('content', 'product');
-                            }
-                        }
-                    }
 
-                    echo '</div>';
+                        while (have_posts()) :
+                            the_post();
+                            ?>
+                            <div class="product-item card card-hover">
+                                <div class="product-image aspect-w-1 aspect-h-1 overflow-hidden rounded-t-xl">
+                                    <a href="<?php the_permalink(); ?>">
+                                        <?php woocommerce_template_loop_product_thumbnail(); ?>
+                                    </a>
+                                </div>
+                                
+                                <div class="product-info p-4">
+                                    <h3 class="product-title text-lg font-semibold text-gray-900 mb-2 hover:text-purple-600 transition-colors">
+                                        <a href="<?php the_permalink(); ?>">
+                                            <?php the_title(); ?>
+                                        </a>
+                                    </h3>
+                                    
+                                    <div class="product-price text-xl font-bold text-purple-600 mb-3">
+                                        <?php woocommerce_template_loop_price(); ?>
+                                    </div>
+                                    
+                                    <div class="product-rating mb-3">
+                                        <?php woocommerce_template_loop_rating(); ?>
+                                    </div>
+                                    
+                                    <div class="product-actions">
+                                        <?php woocommerce_template_loop_add_to_cart(); ?>
+                                    </div>
+                                </div>
+                            </div>
+                        <?php endwhile; ?>
 
-                    do_action('woocommerce_after_shop_loop');
-                } else {
-                    do_action('woocommerce_no_products_found');
-                }
-                ?>
+                        <?php woocommerce_product_loop_end(); ?>
+                    </div>
+
+                    <!-- Pagination -->
+                    <div class="mt-12">
+                        <?php woocommerce_pagination(); ?>
+                    </div>
+
+                <?php else : ?>
+                    <!-- No Products Found -->
+                    <div class="text-center py-16 bg-white rounded-xl shadow-sm border border-gray-100">
+                        <div class="mb-6">
+                            <i class="fas fa-shopping-bag text-6xl text-gray-300"></i>
+                        </div>
+                        <h2 class="text-2xl font-bold text-gray-900 mb-4">
+                            <?php esc_html_e('No products found', 'shopora-premium-commerce'); ?>
+                        </h2>
+                        <p class="text-gray-600 mb-6">
+                            <?php esc_html_e('Sorry, but no products were found matching your selection.', 'shopora-premium-commerce'); ?>
+                        </p>
+                        <a href="<?php echo esc_url(home_url('/')); ?>" class="btn-primary">
+                            <?php esc_html_e('Continue Shopping', 'shopora-premium-commerce'); ?>
+                        </a>
+                    </div>
+                <?php endif; ?>
             </div>
         </div>
     </div>
 </div>
 
-<?php
-do_action('woocommerce_after_main_content');
-get_footer('shop');
-?>
+<?php get_footer('shop'); ?>
