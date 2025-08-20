@@ -1,258 +1,173 @@
 <?php get_header(); ?>
 
-<main class="main-content">
-    <!-- Hero Section -->
-    <?php if (get_theme_mod('hero_enable', true)) : ?>
-        <section class="hero-section" style="<?php if (get_theme_mod('hero_background_image')) : ?>background-image: url(<?php echo esc_url(get_theme_mod('hero_background_image')); ?>);<?php endif; ?>">
-            <div class="hero-overlay"></div>
-            <div class="container">
-                <div class="hero-content">
-                    <h1 class="hero-title"><?php echo esc_html(get_theme_mod('hero_title', 'Premium Products for Modern Living')); ?></h1>
-                    <p class="hero-description"><?php echo esc_html(get_theme_mod('hero_description', 'Discover our curated collection of high-quality products designed to enhance your lifestyle.')); ?></p>
-                    <div class="hero-actions">
-                        <?php if (class_exists('WooCommerce')) : ?>
-                            <a href="<?php echo esc_url(wc_get_page_permalink('shop')); ?>" class="btn btn-primary btn-large">
-                                <?php esc_html_e('Shop Now', 'shopora-premium-commerce'); ?>
-                            </a>
-                        <?php endif; ?>
-                        <a href="<?php echo esc_url(get_permalink(get_page_by_path('about'))); ?>" class="btn btn-secondary btn-large">
-                            <?php esc_html_e('Learn More', 'shopora-premium-commerce'); ?>
-                        </a>
-                    </div>
+<!-- Hero Section -->
+<section class="bg-gradient-to-br from-purple-900 via-purple-700 to-indigo-800 text-white py-24">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div class="fade-in">
+                <h1 class="text-5xl lg:text-6xl font-bold mb-6 leading-tight">
+                    Premium Products for 
+                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-orange-500">
+                        Modern Living
+                    </span>
+                </h1>
+                <p class="text-xl text-gray-200 mb-8 leading-relaxed">
+                    Discover our curated collection of high-quality products designed to enhance your lifestyle with cutting-edge technology and exceptional design.
+                </p>
+                <div class="flex flex-col sm:flex-row gap-4">
+                    <a href="/shop" class="btn-primary text-lg px-8 py-4">
+                        <i class="fas fa-shopping-bag mr-2"></i>
+                        Shop Now
+                    </a>
+                    <a href="#featured" class="btn-secondary text-lg px-8 py-4 bg-transparent border-2 border-white text-white hover:bg-white hover:text-purple-700">
+                        <i class="fas fa-arrow-down mr-2"></i>
+                        Explore Products
+                    </a>
                 </div>
             </div>
-        </section>
-    <?php endif; ?>
-
-    <!-- Featured Products Section -->
-    <?php if (class_exists('WooCommerce')) : ?>
-        <section class="featured-products">
-            <div class="container">
-                <div class="section-header">
-                    <h2><?php esc_html_e('Featured Products', 'shopora-premium-commerce'); ?></h2>
-                    <p><?php esc_html_e('Discover our most popular items, carefully selected for their quality and innovation', 'shopora-premium-commerce'); ?></p>
-                </div>
-
-                <div class="products-grid">
-                    <?php
-                    $featured_products = wc_get_featured_product_ids();
-
-                    if (!empty($featured_products)) {
-                        $featured_query = new WP_Query(array(
-                            'post_type' => 'product',
-                            'posts_per_page' => 6,
-                            'post__in' => $featured_products,
-                            'orderby' => 'post__in'
-                        ));
-                    } else {
-                        // Fallback to recent products if no featured products
-                        $featured_query = new WP_Query(array(
-                            'post_type' => 'product',
-                            'posts_per_page' => 6,
-                            'meta_query' => array(
-                                array(
-                                    'key' => '_visibility',
-                                    'value' => array('catalog', 'visible'),
-                                    'compare' => 'IN'
-                                )
-                            )
-                        ));
-                    }
-
-                    if ($featured_query->have_posts()) :
-                        while ($featured_query->have_posts()) : $featured_query->the_post();
-                            global $product;
-                            ?>
-                            <div class="product-card fade-in">
-                                <div class="product-image-container">
-                                    <a href="<?php the_permalink(); ?>">
-                                        <?php if (has_post_thumbnail()) : ?>
-                                            <?php the_post_thumbnail('shopora-product-grid'); ?>
-                                        <?php else : ?>
-                                            <div class="product-placeholder">
-                                                <i class="fas fa-image" style="font-size: 3rem; color: var(--primary-color);"></i>
-                                            </div>
-                                        <?php endif; ?>
-                                    </a>
-
-                                    <?php if ($product->is_on_sale()) : ?>
-                                        <span class="onsale"><?php esc_html_e('Sale!', 'shopora-premium-commerce'); ?></span>
-                                    <?php endif; ?>
-                                </div>
-                                <div class="product-info">
-                                    <h3 class="product-title">
-                                        <a href="<?php the_permalink(); ?>"><?php the_title(); ?></a>
-                                    </h3>
-                                    <div class="product-price">
-                                        <?php echo $product->get_price_html(); ?>
-                                    </div>
-                                    <div class="product-actions">
-                                        <?php woocommerce_template_loop_add_to_cart(); ?>
-                                    </div>
-                                </div>
-                            </div>
-                            <?php
-                        endwhile;
-                        wp_reset_postdata();
-                    else :
-                        // Fallback static products for demo
-                        $demo_products = array(
-                            array('icon' => 'fas fa-headphones', 'title' => 'Premium Wireless Headphones', 'price' => '$299.00'),
-                            array('icon' => 'fas fa-laptop', 'title' => 'Smart Laptop Pro', 'price' => '$1,299.00'),
-                            array('icon' => 'fas fa-mobile-alt', 'title' => 'Smartphone Pro Max', 'price' => '$899.00'),
-                            array('icon' => 'fas fa-watch', 'title' => 'Smart Watch Elite', 'price' => '$399.00'),
-                            array('icon' => 'fas fa-camera', 'title' => 'Digital Camera 4K', 'price' => '$799.00'),
-                            array('icon' => 'fas fa-gamepad', 'title' => 'Gaming Controller Pro', 'price' => '$89.00'),
-                        );
-
-                        foreach ($demo_products as $demo_product) :
-                        ?>
-                        <div class="product-card fade-in">
-                            <div class="product-image-container">
-                                <div class="product-placeholder">
-                                    <i class="<?php echo esc_attr($demo_product['icon']); ?>" style="font-size: 3rem; color: var(--primary-color);"></i>
-                                </div>
-                            </div>
-                            <div class="product-info">
-                                <h3 class="product-title"><?php echo esc_html($demo_product['title']); ?></h3>
-                                <div class="product-price"><?php echo esc_html($demo_product['price']); ?></div>
-                                <div class="product-actions">
-                                    <?php if (class_exists('WooCommerce')) : ?>
-                                        <a href="<?php echo esc_url(wc_get_page_permalink('shop')); ?>" class="btn btn-primary">
-                                            <?php esc_html_e('Shop Now', 'shopora-premium-commerce'); ?>
-                                        </a>
-                                    <?php endif; ?>
-                                </div>
-                            </div>
-                        </div>
-                        <?php endforeach; ?>
-                    <?php endif; ?>
-                </div>
-
-                <div class="section-footer">
-                    <?php if (class_exists('WooCommerce')) : ?>
-                        <a href="<?php echo esc_url(wc_get_page_permalink('shop')); ?>" class="btn btn-secondary btn-large">
-                            <?php esc_html_e('View All Products', 'shopora-premium-commerce'); ?>
-                        </a>
-                    <?php endif; ?>
-                </div>
-            </div>
-        </section>
-    <?php endif; ?>
-
-    <!-- About Section -->
-    <section class="about-section">
-        <div class="container">
-            <div class="about-content">
-                <div class="about-text">
-                    <h2><?php esc_html_e('About Premium Commerce', 'shopora-premium-commerce'); ?></h2>
-                    <p><?php esc_html_e('We are dedicated to providing you with the finest selection of premium products. Our team carefully curates each item to ensure exceptional quality, innovative design, and outstanding value.', 'shopora-premium-commerce'); ?></p>
-
-                    <div class="features-grid">
-                        <div class="feature-item">
-                            <div class="feature-icon">
-                                <i class="fas fa-truck"></i>
-                            </div>
-                            <h4><?php esc_html_e('Free Shipping', 'shopora-premium-commerce'); ?></h4>
-                            <p><?php esc_html_e('Free delivery on orders over $100', 'shopora-premium-commerce'); ?></p>
-                        </div>
-
-                        <div class="feature-item">
-                            <div class="feature-icon">
-                                <i class="fas fa-shield-alt"></i>
-                            </div>
-                            <h4><?php esc_html_e('Secure Payment', 'shopora-premium-commerce'); ?></h4>
-                            <p><?php esc_html_e('100% secure payment processing', 'shopora-premium-commerce'); ?></p>
-                        </div>
-
-                        <div class="feature-item">
-                            <div class="feature-icon">
-                                <i class="fas fa-undo"></i>
-                            </div>
-                            <h4><?php esc_html_e('Easy Returns', 'shopora-premium-commerce'); ?></h4>
-                            <p><?php esc_html_e('30-day hassle-free returns', 'shopora-premium-commerce'); ?></p>
-                        </div>
-                    </div>
-
-                    <div class="about-actions">
-                        <a href="<?php echo esc_url(get_permalink(get_page_by_path('about'))); ?>" class="btn btn-primary">
-                            <?php esc_html_e('Learn More', 'shopora-premium-commerce'); ?>
-                        </a>
-                    </div>
-                </div>
-
-                <div class="about-image">
-                    <div class="image-placeholder">
-                        <i class="fas fa-store" style="font-size: 8rem; color: var(--primary-color);"></i>
-                    </div>
+            <div class="fade-in">
+                <div class="relative">
+                    <div class="absolute inset-0 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-3xl blur-2xl opacity-30 transform rotate-6"></div>
+                    <img src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=600&h=400&fit=crop" 
+                         alt="Premium Products" 
+                         class="relative rounded-3xl shadow-2xl transform hover:scale-105 transition-transform duration-300">
                 </div>
             </div>
         </div>
-    </section>
+    </div>
+</section>
 
-    <!-- Blog Section -->
-    <section class="blog-section">
-        <div class="container">
-            <div class="section-header">
-                <h2><?php esc_html_e('Latest News & Updates', 'shopora-premium-commerce'); ?></h2>
-                <p><?php esc_html_e('Stay updated with our latest product releases, company news, and helpful tips', 'shopora-premium-commerce'); ?></p>
+<!-- Features Section -->
+<section class="py-20 bg-gray-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-16 fade-in">
+            <h2 class="text-4xl font-bold text-gray-900 mb-4">Why Choose Shopora?</h2>
+            <p class="text-xl text-gray-600 max-w-3xl mx-auto">We're committed to providing you with the best products and exceptional customer service</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div class="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-shadow fade-in">
+                <div class="w-16 h-16 bg-gradient-to-r from-green-400 to-blue-500 rounded-2xl flex items-center justify-center mb-6">
+                    <i class="fas fa-shipping-fast text-white text-2xl"></i>
+                </div>
+                <h3 class="text-2xl font-bold text-gray-900 mb-4">Free Shipping</h3>
+                <p class="text-gray-600">Fast delivery on orders over $50. No hidden fees, just quality products delivered to your door.</p>
             </div>
 
-            <div class="blog-grid">
-                <?php
-                $blog_query = new WP_Query(array(
-                    'post_type' => 'post',
-                    'posts_per_page' => 3,
-                    'post_status' => 'publish'
-                ));
-
-                if ($blog_query->have_posts()) :
-                    while ($blog_query->have_posts()) : $blog_query->the_post();
-                ?>
-                        <article class="blog-card fade-in">
-                            <?php if (has_post_thumbnail()) : ?>
-                                <div class="blog-image">
-                                    <a href="<?php the_permalink(); ?>">
-                                        <?php the_post_thumbnail('shopora-blog-grid'); ?>
-                                    </a>
-                                </div>
-                            <?php endif; ?>
-
-                            <div class="blog-content">
-                                <div class="blog-meta">
-                                    <span class="blog-date"><?php echo get_the_date(); ?></span>
-                                    <span class="blog-category"><?php the_category(', '); ?></span>
-                                </div>
-
-                                <h3 class="blog-title">
-                                    <a href="<?php the_permalink(); ?>"><?php the_title(); ?></a>
-                                </h3>
-
-                                <div class="blog-excerpt">
-                                    <?php the_excerpt(); ?>
-                                </div>
-
-                                <div class="blog-footer">
-                                    <a href="<?php the_permalink(); ?>" class="btn btn-primary">
-                                        <?php esc_html_e('Read More', 'shopora-premium-commerce'); ?>
-                                    </a>
-                                </div>
-                            </div>
-                        </article>
-                <?php
-                    endwhile;
-                    wp_reset_postdata();
-                endif;
-                ?>
+            <div class="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-shadow fade-in">
+                <div class="w-16 h-16 bg-gradient-to-r from-purple-400 to-pink-500 rounded-2xl flex items-center justify-center mb-6">
+                    <i class="fas fa-shield-alt text-white text-2xl"></i>
+                </div>
+                <h3 class="text-2xl font-bold text-gray-900 mb-4">Secure Payment</h3>
+                <p class="text-gray-600">Your payment information is protected with bank-level security and encryption.</p>
             </div>
 
-            <div class="section-footer">
-                <a href="<?php echo esc_url(get_permalink(get_option('page_for_posts'))); ?>" class="btn btn-secondary btn-large">
-                    <?php esc_html_e('View All Posts', 'shopora-premium-commerce'); ?>
-                </a>
+            <div class="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-shadow fade-in">
+                <div class="w-16 h-16 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-2xl flex items-center justify-center mb-6">
+                    <i class="fas fa-undo text-white text-2xl"></i>
+                </div>
+                <h3 class="text-2xl font-bold text-gray-900 mb-4">Easy Returns</h3>
+                <p class="text-gray-600">30-day hassle-free returns. Not satisfied? Send it back for a full refund.</p>
             </div>
         </div>
-    </section>
-</main>
+    </div>
+</section>
+
+<!-- Featured Products -->
+<section id="featured" class="py-20 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-16 fade-in">
+            <h2 class="text-4xl font-bold text-gray-900 mb-4">Featured Products</h2>
+            <p class="text-xl text-gray-600">Hand-picked selection of our most popular and innovative products</p>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            <?php
+            // Sample featured products data
+            $featured_products = [
+                [
+                    'name' => 'Premium Wireless Headphones',
+                    'price' => '$299.99',
+                    'image' => 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=300&h=300&fit=crop',
+                    'rating' => 5
+                ],
+                [
+                    'name' => 'Smart Laptop Pro',
+                    'price' => '$1,299.99',
+                    'image' => 'https://images.unsplash.com/photo-1496181133206-80ce9b888a853?w=300&h=300&fit=crop',
+                    'rating' => 5
+                ],
+                [
+                    'name' => 'Smartphone Pro Max',
+                    'price' => '$999.99',
+                    'image' => 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=300&h=300&fit=crop',
+                    'rating' => 4
+                ],
+                [
+                    'name' => 'Smart Watch Elite',
+                    'price' => '$399.99',
+                    'image' => 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=300&h=300&fit=crop',
+                    'rating' => 5
+                ]
+            ];
+
+            foreach ($featured_products as $index => $product) :
+            ?>
+            <div class="group bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 fade-in">
+                <div class="relative overflow-hidden rounded-t-2xl">
+                    <img src="<?php echo esc_url($product['image']); ?>" 
+                         alt="<?php echo esc_attr($product['name']); ?>" 
+                         class="w-full h-64 object-cover group-hover:scale-110 transition-transform duration-500">
+                    <div class="absolute top-4 right-4">
+                        <span class="bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
+                            Featured
+                        </span>
+                    </div>
+                    <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-300 flex items-center justify-center">
+                        <button class="bg-white text-purple-600 px-6 py-3 rounded-full font-semibold opacity-0 group-hover:opacity-100 transform translate-y-4 group-hover:translate-y-0 transition-all duration-300">
+                            <i class="fas fa-shopping-cart mr-2"></i>
+                            Add to Cart
+                        </button>
+                    </div>
+                </div>
+                <div class="p-6">
+                    <div class="flex items-center mb-2">
+                        <?php for ($i = 1; $i <= 5; $i++) : ?>
+                            <i class="fas fa-star <?php echo $i <= $product['rating'] ? 'text-yellow-400' : 'text-gray-300'; ?> text-sm"></i>
+                        <?php endfor; ?>
+                    </div>
+                    <h3 class="text-lg font-bold text-gray-900 mb-2"><?php echo esc_html($product['name']); ?></h3>
+                    <p class="text-2xl font-bold text-purple-600"><?php echo esc_html($product['price']); ?></p>
+                </div>
+            </div>
+            <?php endforeach; ?>
+        </div>
+
+        <div class="text-center mt-12 fade-in">
+            <a href="/shop" class="btn-primary text-lg px-8 py-4">
+                <i class="fas fa-store mr-2"></i>
+                View All Products
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- Newsletter Section -->
+<section class="py-20 bg-gradient-to-r from-purple-600 to-indigo-600">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center fade-in">
+        <h2 class="text-4xl font-bold text-white mb-4">Stay Updated</h2>
+        <p class="text-xl text-purple-100 mb-8">Subscribe to our newsletter for exclusive deals and product updates</p>
+
+        <form class="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
+            <input type="email" 
+                   placeholder="Enter your email" 
+                   class="flex-1 px-6 py-4 rounded-full border-0 focus:ring-4 focus:ring-white focus:ring-opacity-50 text-gray-900">
+            <button type="submit" 
+                    class="bg-white text-purple-600 px-8 py-4 rounded-full font-semibold hover:bg-gray-100 transition-colors">
+                Subscribe
+            </button>
+        </form>
+    </div>
+</section>
 
 <?php get_footer(); ?>
