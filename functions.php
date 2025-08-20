@@ -31,12 +31,68 @@ if (!defined('ABSPATH')) {
             function home_url($path = '') { return 'http://localhost:5000' . $path; }
         }
         if (!function_exists('get_bloginfo')) {
-            function get_bloginfo($show) {
+            function get_bloginfo($show = '') {
                 switch ($show) {
                     case 'name': return 'Shopora Premium Commerce';
                     case 'description': return 'Premium WordPress Theme';
-                    default: return '';
+                    case 'charset': return 'UTF-8';
+                    default: return 'Shopora Premium Commerce';
                 }
+            }
+        }
+        if (!function_exists('language_attributes')) {
+            function language_attributes() { return 'lang="en-US"'; }
+        }
+        if (!function_exists('body_class')) {
+            function body_class($class = '') { 
+                $classes = is_array($class) ? $class : explode(' ', $class);
+                $classes[] = 'shopora-theme';
+                return 'class="' . implode(' ', $classes) . '"'; 
+            }
+        }
+        if (!function_exists('wp_head')) {
+            function wp_head() {
+                echo '<title>' . get_bloginfo('name') . ' - ' . get_bloginfo('description') . '</title>';
+                echo '<link rel="stylesheet" href="/style.css">';
+                echo '<link rel="stylesheet" href="/assets/css/main.css">';
+            }
+        }
+        if (!function_exists('wp_footer')) {
+            function wp_footer() {
+                echo '<script src="/assets/js/main.js"></script>';
+            }
+        }
+        if (!function_exists('wp_body_open')) {
+            function wp_body_open() {}
+        }
+        if (!function_exists('has_custom_logo')) {
+            function has_custom_logo() { return false; }
+        }
+        if (!function_exists('the_custom_logo')) {
+            function the_custom_logo() {}
+        }
+        if (!function_exists('wp_nav_menu')) {
+            function wp_nav_menu($args = array()) {
+                if (isset($args['fallback_cb']) && function_exists($args['fallback_cb'])) {
+                    call_user_func($args['fallback_cb']);
+                }
+            }
+        }
+        if (!function_exists('has_nav_menu')) {
+            function has_nav_menu($location) { return false; }
+        }
+        if (!function_exists('is_singular')) {
+            function is_singular() { return false; }
+        }
+        if (!function_exists('comments_open')) {
+            function comments_open() { return false; }
+        }
+        if (!function_exists('get_option')) {
+            function get_option($option, $default = false) { return $default; }
+        }
+        if (!function_exists('sanitize_title')) {
+            function sanitize_title($title) { 
+                return strtolower(preg_replace('/[^a-zA-Z0-9]+/', '-', trim($title)));
             }
         }
         if (!function_exists('wp_get_theme')) {

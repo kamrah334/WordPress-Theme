@@ -276,3 +276,87 @@
 <script src="assets/js/main.js"></script>
 </body>
 </html>
+<?php get_header(); ?>
+
+<div class="bg-gray-50 min-h-screen pt-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Breadcrumb -->
+        <nav class="mb-8">
+            <ol class="flex items-center space-x-2 text-sm text-gray-500">
+                <li><a href="/" class="hover:text-purple-600 transition-colors">Home</a></li>
+                <li><i class="fas fa-chevron-right text-gray-400"></i></li>
+                <li><a href="/shop" class="hover:text-purple-600 transition-colors">Shop</a></li>
+                <li><i class="fas fa-chevron-right text-gray-400"></i></li>
+                <li class="text-gray-900">Product</li>
+            </ol>
+        </nav>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-16">
+            <!-- Product Gallery -->
+            <div>
+                <div class="bg-white rounded-2xl shadow-lg overflow-hidden mb-4">
+                    <div class="aspect-square bg-gray-100 relative">
+                        <img src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=600&h=600&fit=crop" 
+                             alt="Product" 
+                             class="w-full h-full object-cover">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Product Info -->
+            <div>
+                <div class="bg-white rounded-2xl shadow-lg p-8">
+                    <h1 class="text-3xl font-bold text-gray-900 mb-4">Sample Product</h1>
+                    <div class="flex items-center space-x-4 mb-6">
+                        <div class="flex items-center">
+                            <div class="flex">
+                                <?php for ($i = 1; $i <= 5; $i++) : ?>
+                                    <i class="fas fa-star text-yellow-400"></i>
+                                <?php endfor; ?>
+                            </div>
+                            <span class="ml-2 text-gray-600">(128 reviews)</span>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-8">
+                        <div class="flex items-center space-x-4 mb-4">
+                            <span class="text-4xl font-bold text-purple-600">$299.99</span>
+                            <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-semibold">In Stock</span>
+                        </div>
+                    </div>
+
+                    <div class="space-y-4 mb-8">
+                        <button class="w-full bg-gradient-to-r from-purple-600 to-purple-700 text-white py-4 rounded-xl font-semibold text-lg hover:from-purple-700 hover:to-purple-800 transition-all">
+                            <i class="fas fa-shopping-cart mr-2"></i>
+                            Add to Cart
+                        </button>
+                        <button class="w-full border-2 border-gray-300 text-gray-700 py-4 rounded-xl font-semibold text-lg hover:border-purple-600 hover:text-purple-600 transition-colors">
+                            <i class="fas fa-heart mr-2"></i>
+                            Add to Wishlist
+                        </button>
+                    </div>
+
+                    <div class="border-t pt-6">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-4">Product Features</h3>
+                        <ul class="space-y-2">
+                            <li class="flex items-center text-gray-700">
+                                <i class="fas fa-check text-green-500 mr-3"></i>
+                                High Quality Materials
+                            </li>
+                            <li class="flex items-center text-gray-700">
+                                <i class="fas fa-check text-green-500 mr-3"></i>
+                                Fast Shipping
+                            </li>
+                            <li class="flex items-center text-gray-700">
+                                <i class="fas fa-check text-green-500 mr-3"></i>
+                                1 Year Warranty
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<?php get_footer(); ?>
